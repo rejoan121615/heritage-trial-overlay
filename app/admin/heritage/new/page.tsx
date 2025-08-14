@@ -14,7 +14,12 @@ import {
   styled,
   Divider,
   SelectChangeEvent,
+  FormHelperText,
+  Box,
 } from "@mui/material";
+import z, { string } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const categoryOptions = [
   "ruins",
@@ -41,62 +46,49 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-type InputStateTYPE = {
-  title: string;
-  description: string;
-  image: File | undefined;
-  location: string;
-  category: string;
-};
+const NewHeritageSchema = z.object({
+  title: z.string().min(10, "Title must be atleast 10 character long."),
+  description: z.string(),
+  location: z.string().nonempty(),
+  category: z.enum(
+    [
+      "ruins",
+      "monastery",
+      "palace",
+      "mosque",
+      "historic town",
+      "temple",
+      "museum",
+      "church",
+      "architecture",
+      "residence",
+    ],
+    { message: "Please select a valid category" }
+  ),
+  image: z
+    .instanceof(File, { message: "Please upload a file" })
+    .refine((file) => file.size <= 10 * 1024 * 1024, {
+      message: "File size must be less than 10MB",
+    })
+    .refine((file) => file.type.startsWith("image/"), {
+      message: "Only image files are allowed",
+    }),
+});
+
+type HeritageDataTYPE = z.infer<typeof NewHeritageSchema>;
 
 const NewHeritagePage = () => {
-  const [inputValue, setInputValue] = useState<InputStateTYPE>({
-    title: "",
-    description: "",
-    image: undefined,
-    location: "",
-    category: "",
+  const {
+    handleSubmit,
+    register,
+    control,
+    formState: { errors },
+  } = useForm<HeritageDataTYPE>({
+    resolver: zodResolver(NewHeritageSchema),
+    mode: "all",
   });
 
-
-  const changeHandler = (
-    key: keyof InputStateTYPE,
-    input: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> 
-  ) => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        [key]: input.target.value,
-      };
-    });
-  };
-
-  const categoryChangeHandler = (event: SelectChangeEvent) => {
-    setInputValue((prevState) => {
-      return {
-        ...prevState,
-        ["category"]: event.target.value as string,
-      };
-    });
-  };
-
-  const changeImghandler = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files?.[0];
-    if (files) {
-      setInputValue((prevState) => {
-        return {
-          ...prevState,
-          ["image"]: files,
-        };
-      });
-    }
-  };
-
-
-  const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log(event.currentTarget.checkValidity());
-  }
+  const submitHandler = (data: HeritageDataTYPE) => {};
 
   return (
     <Paper sx={{ padding: "20px", borderRadius: "12px" }}>
@@ -106,85 +98,133 @@ const NewHeritagePage = () => {
       >
         Update your heritage
       </Typography>
-      <Stack rowGap={3} component={'form'} onSubmit={submitHandler}>
+      <Stack
+        rowGap={3}
+        component={"form"}
+        onSubmit={handleSubmit(submitHandler)}
+      >
         <TextField
           id="outlined-basic"
           label="Heritage Title:"
           variant="outlined"
-          name="title"
-          value={inputValue.title}
-          onChange={(e) => changeHandler("title", e)}
           fullWidth
+          {...register("title")}
+          error={!!errors.title}
+          helperText={errors.title?.message}
         />
         <TextField
           label="Short Description (optional): "
           multiline
           rows={5}
           margin="normal"
-          name="description"
-          value={inputValue.description}
-          onChange={(e) => changeHandler("description", e)}
           fullWidth
           sx={{ margin: "0px" }}
+          {...register("description")}
+          error={!!errors.description}
+          helperText={errors.description?.message}
         />
 
         <TextField
           id="outlined-basic"
           label="Location:"
           variant="outlined"
-          name="location"
-          value={inputValue.location}
-          onChange={(e) => changeHandler("location", e)}
           fullWidth
+          {...register("location")}
+          error={!!errors.location}
+          helperText={errors.description?.message}
         />
 
-        {/* category  */}
-        <FormControl fullWidth>
-          <InputLabel>Select Category</InputLabel>
-
-          <Select
-            value={inputValue.category}
-            name="category"
-            onChange={categoryChangeHandler}
-          >
-            {categoryOptions.map((catItem, index) => (
-              <MenuItem key={index} value={catItem.trim().replaceAll(" ", "_")}>
-                {catItem}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* heritage img file  */}
-        <Button
-          component="label"
-          role={undefined}
-          variant="outlined"
-          tabIndex={-1}
-          size="large"
-          sx={{
-            padding: "15px 0px",
-            color: "#676767",
-            borderColor: "#c4c4c4",
-            "&:hover": { borderColor: "#212121" },
+        <Controller
+          name="category"
+          control={control}
+          defaultValue="ruins"
+          render={({ field }) => {
+            return (
+              <FormControl fullWidth error={!!errors.category}>
+                <InputLabel id="select-category-label">
+                  Select Category
+                </InputLabel>
+                <Select
+                  labelId="select-category-label"
+                  value={field.value}
+                  onChange={field.onChange}
+                  sx={{ textTransform: 'capitalize' }}
+                >
+                  {categoryOptions.map((catItem, index) => (
+                    <MenuItem
+                      key={index}
+                      value={catItem}
+                      sx={{ textTransform: 'capitalize'}}
+                    >
+                      {catItem}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.category ? (
+                  <FormHelperText>{errors.category.message}</FormHelperText>
+                ) : null}
+              </FormControl>
+            );
           }}
-        >
-          { inputValue.image ? `Selected File: ${inputValue.image.name}` : 'Upload Image' }
-          <VisuallyHiddenInput
-            type="file"
-            onChange={changeImghandler}
-          />
-        </Button>
+        />
+
+        <Controller
+          name="image"
+          control={control}
+          render={({ field }) => {
+            return (
+              <Box
+                component="div"
+                sx={{ display: "flex", flexFlow: "column wrap" }}
+              >
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="outlined"
+                  tabIndex={-1}
+                  size="large"
+                  sx={{
+                    padding: "15px 0px",
+                    color: errors.image ? "#db2f4f" : "#676767",
+                    borderColor: errors.image ? "#db2f4f" : "#c4c4c4",
+                    "&:hover": { borderColor: "#212121" },
+                  }}
+                >
+                  {field.value
+                    ? `Selected File: ${field.value.name}`
+                    : "Upload Image"}
+                  <VisuallyHiddenInput
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        field.onChange(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </Button>
+                {errors.image && (
+                  <Typography
+                    color="error"
+                    variant="caption"
+                    sx={{ marginLeft: "15px" }}
+                  >
+                    {errors.image.message}
+                  </Typography>
+                )}
+              </Box>
+            );
+          }}
+        />
 
         <Divider />
 
-        {/* submit button  */}
         <Button
           type="submit"
           variant="contained"
           fullWidth
           size="large"
-          sx={{ padding: "15px", fontSize: "18px" }}
+          sx={{ padding: "15px" }}
         >
           Submit
         </Button>

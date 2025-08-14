@@ -7,3 +7,6 @@ export type HeritageItemTYPE = {
   category?: string;     
   tags?: string[];       
 };
+
+
+
