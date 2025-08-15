@@ -1,5 +1,5 @@
 
-import type { HeritageItemTYPE } from '@/types/adminType';
+import type { HeritageItemTYPE } from '@/types/AllTypes';
 
 export const HeritageListData: HeritageItemTYPE[] = [
   {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Stack,
@@ -13,13 +13,19 @@ import {
   Select,
   styled,
   Divider,
-  SelectChangeEvent,
   FormHelperText,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import z, { string } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import { useRouter } from 'next/navigation';
+
+
+
 
 const categoryOptions = [
   "ruins",
@@ -50,21 +56,9 @@ const NewHeritageSchema = z.object({
   title: z.string().min(10, "Title must be atleast 10 character long."),
   description: z.string(),
   location: z.string().nonempty(),
-  category: z.enum(
-    [
-      "ruins",
-      "monastery",
-      "palace",
-      "mosque",
-      "historic town",
-      "temple",
-      "museum",
-      "church",
-      "architecture",
-      "residence",
-    ],
-    { message: "Please select a valid category" }
-  ),
+  category: z.enum(categoryOptions, {
+    message: "Please select a valid category",
+  }),
   image: z
     .instanceof(File, { message: "Please upload a file" })
     .refine((file) => file.size <= 10 * 1024 * 1024, {
@@ -78,6 +72,9 @@ const NewHeritageSchema = z.object({
 type HeritageDataTYPE = z.infer<typeof NewHeritageSchema>;
 
 const NewHeritagePage = () => {
+
+  const router = useRouter();
+
   const {
     handleSubmit,
     register,
@@ -88,7 +85,59 @@ const NewHeritagePage = () => {
     mode: "all",
   });
 
-  const submitHandler = (data: HeritageDataTYPE) => {};
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Function to upload image to Cloudinary
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "heritage_uploads"); // Create this preset in Cloudinary dashboard
+    formData.append("folder", "heritage-sites"); // Optional: organize images in folders
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || "Upload failed");
+    }
+
+    const data = await response.json();
+    return data.secure_url; // Return the image URL
+  };
+
+  const submitHandler = async (data: HeritageDataTYPE) => {
+    setLoading(true); // active loading on submit button
+
+    const { title, description, location, category, image } = data;
+
+    try {
+      const imageUrl = await uploadToCloudinary(image);
+
+    
+      // upload heritage record into db
+      await addDoc(collection(db, "heritages"), {
+        title: title,
+        description: description,
+        location: location,
+        category: category,
+        image: imageUrl,
+      });
+
+      setLoading(false);
+
+      // navigate into all heritage page
+      router.push('/admin/heritage')
+      
+    } catch (error) {
+      console.log("something went wrong ", error);
+    }
+  };
 
   return (
     <Paper sx={{ padding: "20px", borderRadius: "12px" }}>
@@ -148,13 +197,13 @@ const NewHeritagePage = () => {
                   labelId="select-category-label"
                   value={field.value}
                   onChange={field.onChange}
-                  sx={{ textTransform: 'capitalize' }}
+                  sx={{ textTransform: "capitalize" }}
                 >
                   {categoryOptions.map((catItem, index) => (
                     <MenuItem
                       key={index}
                       value={catItem}
-                      sx={{ textTransform: 'capitalize'}}
+                      sx={{ textTransform: "capitalize" }}
                     >
                       {catItem}
                     </MenuItem>
@@ -225,6 +274,8 @@ const NewHeritagePage = () => {
           fullWidth
           size="large"
           sx={{ padding: "15px" }}
+          loading={loading}
+          loadingIndicator={<CircularProgress size={28} />}
         >
           Submit
         </Button>
