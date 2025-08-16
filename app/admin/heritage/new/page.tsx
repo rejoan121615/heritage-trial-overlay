@@ -17,15 +17,12 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import z, { string } from "zod";
+import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useRouter } from 'next/navigation';
-
-
-
 
 const categoryOptions = [
   "ruins",
@@ -40,17 +37,6 @@ const categoryOptions = [
   "residence",
 ];
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
 
 const NewHeritageSchema = z.object({
   title: z.string().min(10, "Title must be atleast 10 character long."),
@@ -69,7 +55,20 @@ const NewHeritageSchema = z.object({
     }),
 });
 
-type HeritageDataTYPE = z.infer<typeof NewHeritageSchema>;
+type HeritageFormDataTYPE = z.infer<typeof NewHeritageSchema>;
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
+
 
 const NewHeritagePage = () => {
 
@@ -80,7 +79,7 @@ const NewHeritagePage = () => {
     register,
     control,
     formState: { errors },
-  } = useForm<HeritageDataTYPE>({
+  } = useForm<HeritageFormDataTYPE>({
     resolver: zodResolver(NewHeritageSchema),
     mode: "all",
   });
@@ -111,7 +110,7 @@ const NewHeritagePage = () => {
     return data.secure_url; // Return the image URL
   };
 
-  const submitHandler = async (data: HeritageDataTYPE) => {
+  const submitHandler = async (data: HeritageFormDataTYPE) => {
     setLoading(true); // active loading on submit button
 
     const { title, description, location, category, image } = data;

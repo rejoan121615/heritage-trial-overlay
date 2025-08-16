@@ -5,17 +5,17 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { HeritageItemTYPE } from "@/types/AllTypes";
+import { HeritageDataTYPE } from "@/types/AllTypes";
 import Link from "next/link";
 
-const HeritageCard = ( { data } : { data : HeritageItemTYPE } ) => {
+const HeritageCard = ( { data } : { data : HeritageDataTYPE } ) => {
   return (
     <Card sx={{ width: '100%' }}>
       <CardMedia
         component="img"
         alt="green iguana"
         height="140"
-        image={data.imageUrl}
+        image={data.image}
         sx={{ height: '200px'}}
       />
       <CardContent>

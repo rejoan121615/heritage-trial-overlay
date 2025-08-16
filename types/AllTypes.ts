@@ -1,10 +1,9 @@
+
 export type HeritageDataTYPE = {
-  title: string;
-  description?: string;
-  imageUrl: string;
-  location: string;     
-  category: string;     
-};
-
-
-
+    id: string;
+    title: string;
+    description: string;
+    location: string;
+    category: string;
+    image: string;
+}
