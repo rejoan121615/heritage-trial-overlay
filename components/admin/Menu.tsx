@@ -9,10 +9,10 @@ const Menu = () => {
       <AppBar className="app-bar" position="static">
         <Toolbar sx={{ justifyContent: 'end'}}>
           <Stack direction={"row"} columnGap={3} >
-            <Link href="/admin/login">
+            <Link href="/login">
               <Button color="inherit">Login</Button>
             </Link>
-            <Link href="/admin/register">
+            <Link href="/register">
               <Button color="inherit">Register</Button>
             </Link>
           </Stack>

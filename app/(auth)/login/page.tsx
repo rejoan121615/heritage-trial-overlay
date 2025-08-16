@@ -51,7 +51,7 @@ const LoginPage = () => {
       console.log(res);
 
       if (res.user) {
-        router.push("/admin");
+        router.push("/heritage");
       }
     } catch (error) {
       console.log("got an error ", error);

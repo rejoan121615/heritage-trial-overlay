@@ -14,7 +14,7 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        router.replace("/admin");
+        router.replace("/heritage");
       } else {
         setCanRender(true);
       }
