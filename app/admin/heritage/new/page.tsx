@@ -20,8 +20,8 @@ import {
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db, auth } from "@/firebase/firebaseConfig";
 import { useRouter } from 'next/navigation';
 
 const categoryOptions = [
@@ -114,6 +114,7 @@ const NewHeritagePage = () => {
     setLoading(true); // active loading on submit button
 
     const { title, description, location, category, image } = data;
+    const currentUser = auth.currentUser;
 
     try {
       const imageUrl = await uploadToCloudinary(image);
@@ -126,6 +127,8 @@ const NewHeritagePage = () => {
         location: location,
         category: category,
         image: imageUrl,
+        createdAt: serverTimestamp(),
+        userId: currentUser?.uid
       });
 
       setLoading(false);
