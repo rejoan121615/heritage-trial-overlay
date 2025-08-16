@@ -42,9 +42,6 @@ const LoginPage = () => {
 
   const [submitProgress, setSubmitProgress] = useState<boolean>(false);
 
-  // auth status
-  const { loading, user } = useAuth();
-
   // handle submit
   const onSubmit = async (data: LoginFormTYPE) => {
     setSubmitProgress(true);
@@ -53,19 +50,18 @@ const LoginPage = () => {
       const res = await signInWithEmailAndPassword(auth, email, password);
       console.log(res);
 
-
       if (res.user) {
-        router.push('/admin')
+        router.push("/admin");
       }
-
-
     } catch (error) {
-      console.log('got an error ', error)
+      console.log("got an error ", error);
       if (error instanceof FirebaseError) {
         if (error.code === "auth/invalid-credential") {
           setSubmitProgress(false);
           setError("email", { message: "Invalid credentials" });
-          setError("password", { message: "Invalid password, check you password please" });
+          setError("password", {
+            message: "Invalid password, check you password please",
+          });
         }
       }
     }
@@ -75,58 +71,54 @@ const LoginPage = () => {
 
   return (
     <>
-      {loading ? (
-        <LoadingPage />
-      ) : (
-        <FormWrapper
-          title="Login in your account"
-          submitTitle="Login"
-          helperNode={{
-            text: "Does't have an account?",
-            link: {
-              url: "/register",
-              title: "Register",
+      <FormWrapper
+        title="Login in your account"
+        submitTitle="Login"
+        helperNode={{
+          text: "Does't have an account?",
+          link: {
+            url: "/register",
+            title: "Register",
+          },
+        }}
+        submit={handleSubmit(onSubmit)}
+        loading={submitProgress}
+      >
+        <TextField
+          label="Email"
+          placeholder="eb@email.com"
+          size="medium"
+          {...register("email")}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AlternateEmailIcon />
+                </InputAdornment>
+              ),
             },
           }}
-          submit={handleSubmit(onSubmit)}
-          loading={submitProgress}
-        >
-          <TextField
-            label="Email"
-            placeholder="eb@email.com"
-            size="medium"
-            {...register("email")}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <AlternateEmailIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            label="Password"
-            placeholder="Ex: 1@dfeE898o"
-            size="medium"
-            {...register("password")}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <KeyIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </FormWrapper>
-      )}
+        />
+        <TextField
+          label="Password"
+          placeholder="Ex: 1@dfeE898o"
+          size="medium"
+          {...register("password")}
+          error={!!errors.password}
+          helperText={errors.password?.message}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <KeyIcon />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </FormWrapper>
     </>
   );
 };

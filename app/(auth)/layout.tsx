@@ -1,22 +1,27 @@
-'use client'
+"use client";
 
+import LoadingPage from "@/components/feedback/LoadingPage";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
-import React, { ReactNode , useEffect} from "react";
-import { useAuthState } from 'react-firebase-hooks/auth'
+import React, { ReactNode, useEffect, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
-
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const router = useRouter();
-
+  const [canRender, setCanRender] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) {
-      router.push('/admin')
+    if (!loading) {
+      if (user) {
+        router.replace("/admin");
+      } else {
+        setCanRender(true);
+      }
     }
-  }, [user, loading, router])
-  
+  }, [user, loading, router]);
+
+  if (loading || !canRender) return <LoadingPage />;
 
   return <>{children}</>;
 };
