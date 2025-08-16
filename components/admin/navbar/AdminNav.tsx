@@ -17,12 +17,17 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { NavList } from "../AdminNav-data";
 import Link from "next/link";
+import UserProfile from "@/components/userProfile";
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
+import { useRouter } from "next/navigation";
 
 const drawerWidth = "300px";
 
 const AdminNav = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const router = useRouter();
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -39,27 +44,47 @@ const AdminNav = () => {
     }
   };
 
+  const logoutHandler = async () => {
+    try {
+      await signOut(auth);
+      router.replace('/login');
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  }
+
   const drawer = (
-    <div>
-      <Toolbar />
-      <Divider />
-      <List>
-        {NavList.map((Item, index) => {
-          return (
-            <ListItem key={Item.id} disablePadding>
-              <Link href={`/admin/heritage/${Item.path}`} style={{ width: '100%', textDecoration: 'none'}}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <Item.icon />
-                  </ListItemIcon>
-                  <ListItemText primary={Item.title} sx={{ color: '#707070'}} />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-          );
-        })}
-      </List>
-    </div>
+    <Box sx={{ display: 'flex', flexFlow: 'column wrap', justifyContent: "space-between", height: "100%" }}>
+      {/* navigation  */}
+      <Box>
+        <Toolbar></Toolbar>
+        <Divider />
+        <List>
+          {NavList.map((Item, index) => {
+            return (
+              <ListItem key={Item.id} disablePadding>
+                <Link
+                  href={`/admin/heritage/${Item.path}`}
+                  style={{ width: "100%", textDecoration: "none" }}
+                >
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <Item.icon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={Item.title}
+                      sx={{ color: "#707070" }}
+                    />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
+      {/* user area  */}
+      <UserProfile logout={logoutHandler} />
+    </Box>
   );
 
   return (
@@ -69,7 +94,6 @@ const AdminNav = () => {
         position="fixed"
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          // ml: { sm: `${drawerWidth}px` },
           display: { xs: "block", md: "none" },
         }}
       >

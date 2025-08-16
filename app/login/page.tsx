@@ -1,18 +1,19 @@
 "use client";
 
-import { InputAdornment, TextField } from "@mui/material";
+import { InputAdornment, Snackbar, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import FormWrapper from "@/components/form/FormWrap";
 import { useForm } from "react-hook-form";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import KeyIcon from "@mui/icons-material/Key";
-import z from "zod";
+import z, { set } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import LoadingPage from "@/components/feedback/LoadingPage";
+import { useRouter } from "next/navigation";
 
 const LoginSchema = z.object({
   email: z.email("Invalid email address."),
@@ -22,12 +23,12 @@ const LoginSchema = z.object({
 type LoginFormTYPE = z.infer<typeof LoginSchema>;
 
 const LoginPage = () => {
-
-// form hook 
+  // form hook
   const {
     handleSubmit,
     register,
     formState: { errors },
+    setError,
   } = useForm<LoginFormTYPE>({
     resolver: zodResolver(LoginSchema),
     mode: "all",
@@ -37,21 +38,33 @@ const LoginPage = () => {
     },
   });
 
+  const router = useRouter();
+
   const [submitProgress, setSubmitProgress] = useState<boolean>(false);
-  // auth status 
+
+  // auth status
   const { loading, user } = useAuth();
 
-  // handle submit 
+  // handle submit
   const onSubmit = async (data: LoginFormTYPE) => {
     setSubmitProgress(true);
     const { email, password } = data;
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
-
       console.log(res);
+
+
+      if (res.user) {
+        router.push('/admin')
+      }
+
+
     } catch (error) {
       if (error instanceof FirebaseError) {
-        if (error.code === "") {
+        if (error.code === "auth/invalid-credential") {
+          setSubmitProgress(false);
+          setError("email", { message: "Invalid credentials" });
+          setError("password", { message: "Invalid password, check you password please" });
         }
       }
     }
