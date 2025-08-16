@@ -22,7 +22,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           flexGrow: 1,
           minHeight: '100vh',
           p: 3,
-          marginTop: { xs: '56px', sm: '64px', md: '0px' },
+          paddingTop: { xs: '80px', sm: '84px', md: '24px' },
           width: { sm: `calc(100% - ${drawerWidth})` },
           backgroundColor: "#f7f6f9"
         }}
