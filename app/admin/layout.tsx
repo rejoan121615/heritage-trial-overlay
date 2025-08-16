@@ -1,8 +1,10 @@
 "use client";
-import React from "react";
-import Menu from "@/components/admin/Menu";
+import React, { useEffect } from "react";
 import AdminNavigation from "@/components/admin/navbar/AdminNav";
 import { Box, Toolbar } from "@mui/material";
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { useRouter } from "next/navigation";
+import { auth } from "@/firebase/firebaseConfig";
 
 
 
@@ -11,6 +13,19 @@ const drawerWidth = "300px";
 
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+
+  const router = useRouter();
+  const [user, loading, error] = useAuthState(auth)
+
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login')
+    }
+  }, [loading, user, router]);
+
+
+
   return (
     <Box sx={{ display: "flex" }}>
       {/* admin navbar  */}

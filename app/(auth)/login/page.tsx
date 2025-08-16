@@ -60,6 +60,7 @@ const LoginPage = () => {
 
 
     } catch (error) {
+      console.log('got an error ', error)
       if (error instanceof FirebaseError) {
         if (error.code === "auth/invalid-credential") {
           setSubmitProgress(false);

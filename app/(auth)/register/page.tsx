@@ -13,7 +13,8 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { FirebaseError } from "firebase/app";
-import { redirect } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
+
 
 const RegisterSchema = z
   .object({
@@ -45,6 +46,8 @@ const RegisterPage = () => {
     }
   });
 
+  const router = useRouter();
+
   const onSubmit = async (data: RegisterFormTYPE) => {
     const { name, email, password } = data;
     try {
@@ -58,6 +61,9 @@ const RegisterPage = () => {
         email,
         createdAt: new Date(),
       });
+
+      // redirect 
+      router.replace('/admin')
     } catch (error) {
       if (error instanceof FirebaseError ) {
         if (error.code === "auth/email-already-in-use") {
