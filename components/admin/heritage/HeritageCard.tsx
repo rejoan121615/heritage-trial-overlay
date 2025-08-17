@@ -23,11 +23,11 @@ const HeritageCard = ( { data } : { data : HeritageDataTYPE } ) => {
           { data.title }
         </Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {data.description}
+          {data.summary}
         </Typography>
       </CardContent>
       <CardActions sx={{ padding: '15px'}}>
-        <Link href={`/admin/heritage/${data.id}`}>
+        <Link href={`/heritage/${data.id}`}>
           <Button size="small" variant="contained" color="secondary">details</Button>
         </Link>
         <Button size="small" variant="contained" color="info">edit</Button>

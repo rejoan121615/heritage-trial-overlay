@@ -40,7 +40,6 @@ const HeritageDetailsPage = ({
         },
         function (error) {
           if (error) console.log("creating qr code failed ", error);
-          console.log("genrated qr code successfully");
         }
       );
     }
@@ -58,11 +57,6 @@ const HeritageDetailsPage = ({
             id: docSnapshot.id,
             ...docSnapshot.data(),
           } as HeritageDataTYPE);
-
-          console.log({
-            id: docSnapshot.id,
-            ...docSnapshot.data(),
-          });
         }
       } catch (error) {}
     };
@@ -115,9 +109,9 @@ const HeritageDetailsPage = ({
             </ListItem>
           )}
 
-          {heritage?.description && (
+          {heritage?.summary && (
             <ListItem>
-              <ListItemText>Description: {heritage.description} </ListItemText>
+              <ListItemText>Summary: {heritage?.summary} </ListItemText>
             </ListItem>
           )}
           <ListItem>

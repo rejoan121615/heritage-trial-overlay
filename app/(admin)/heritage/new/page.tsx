@@ -40,8 +40,8 @@ const categoryOptions = [
 
 const NewHeritageSchema = z.object({
   title: z.string().min(10, "Title must be atleast 10 character long."),
-  description: z.string(),
-  location: z.string().nonempty(),
+  summary: z.string().nonempty("Summary is required."),
+  location: z.string().nonempty("Location is required."),
   category: z.enum(categoryOptions, {
     message: "Please select a valid category",
   }),
@@ -113,7 +113,7 @@ const NewHeritagePage = () => {
   const submitHandler = async (data: HeritageFormDataTYPE) => {
     setLoading(true); // active loading on submit button
 
-    const { title, description, location, category, image } = data;
+    const { title, summary, location, category, image } = data;
     const currentUser = auth.currentUser;
 
     try {
@@ -123,7 +123,7 @@ const NewHeritagePage = () => {
       // upload heritage record into db
       await addDoc(collection(db, "heritages"), {
         title: title,
-        description: description,
+        summary: summary,
         location: location,
         category: category,
         image: imageUrl,
@@ -134,7 +134,7 @@ const NewHeritagePage = () => {
       setLoading(false);
 
       // navigate into all heritage page
-      router.push('/admin/heritage')
+      router.push('/heritage')
       
     } catch (error) {
       console.log("something went wrong ", error);
@@ -164,15 +164,15 @@ const NewHeritagePage = () => {
           helperText={errors.title?.message}
         />
         <TextField
-          label="Short Description (optional): "
+          label="Heritage Summary: "
           multiline
           rows={5}
           margin="normal"
           fullWidth
           sx={{ margin: "0px" }}
-          {...register("description")}
-          error={!!errors.description}
-          helperText={errors.description?.message}
+          {...register("summary")}
+          error={!!errors.summary}
+          helperText={errors.summary?.message}
         />
 
         <TextField
@@ -182,7 +182,7 @@ const NewHeritagePage = () => {
           fullWidth
           {...register("location")}
           error={!!errors.location}
-          helperText={errors.description?.message}
+          helperText={errors.location?.message}
         />
 
         <Controller
