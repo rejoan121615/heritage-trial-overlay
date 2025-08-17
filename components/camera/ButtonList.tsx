@@ -1,13 +1,10 @@
 import React from "react";
 import { Box, Slider, Button, IconButton } from "@mui/material";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
-import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import CloseIcon from "@mui/icons-material/Close";
-import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
-import styled from "@emotion/styled";
 import CustomButton from "../CustomComponent/CameraBtn";
 
-const ButtonList = () => {
+const ButtonList = ({ fullScreen }: { fullScreen:  () => void}) => {
   return (
     <Box
       sx={{
@@ -19,7 +16,7 @@ const ButtonList = () => {
         paddingBottom: "10px",
       }}
     >
-      <CustomButton variant="contained" sx={{ marginBottom: "15px" }}>
+      <CustomButton variant="contained" sx={{ marginBottom: "20px" }} onClick={fullScreen}>
         <OpenInFullIcon sx={{ fontSize: "20px" }} />
       </CustomButton>
       <Box
@@ -41,7 +38,7 @@ const ButtonList = () => {
       <CustomButton
         variant="contained"
         color="error"
-        sx={{ marginTop: "15px" }}
+        sx={{ marginTop: "20px" }}
       >
         <CloseIcon sx={{ fontSize: "20px" }} />
       </CustomButton>

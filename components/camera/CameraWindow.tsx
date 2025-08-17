@@ -13,6 +13,35 @@ const CameraWindow = () => {
   const canvasParentRef = useRef<HTMLDivElement | null>(null);
   const [showSummary, setShowSummary] = useState<boolean>(false);
 
+  // full screen mode toggle
+   const toggleFullscreen = (): void => {
+    const el: HTMLElement = document.documentElement;
+
+    if (
+      document.fullscreenElement ||
+      (document as any).webkitFullscreenElement || // Safari
+      (document as any).msFullscreenElement // IE11
+    ) {
+      // Exit full screen
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      } else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen();
+      }
+    } else {
+      // Enter full screen
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if ((el as any).webkitRequestFullscreen) {
+        (el as any).webkitRequestFullscreen();
+      } else if ((el as any).msRequestFullscreen) {
+        (el as any).msRequestFullscreen();
+      }
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -34,7 +63,7 @@ const CameraWindow = () => {
           position: "relative",
         }}
       >
-        <ButtonList />
+        <ButtonList fullScreen={toggleFullscreen} />
 
         <Box
           sx={{
