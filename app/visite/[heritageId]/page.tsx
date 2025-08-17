@@ -1,7 +1,7 @@
 "use client";
 
 import { Box } from "@mui/material";
-import NotSupported from "@/components/camera/NotSupported";
+import NotSupported from "@/components/camera/notSupported";
 import RotateScreen from "@/components/camera/RotateScreen";
 import CameraWindow from "@/components/camera/CameraWindow";
 import HeritageNotFound from "@/components/camera/HeritageNotFound";
