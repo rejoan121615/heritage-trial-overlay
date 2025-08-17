@@ -1,9 +1,12 @@
-import React from 'react'
+"use client";
 
-const HeritagePreviewPage = () => {
+import { Box } from "@mui/material";
+import NotSupported from "@/components/camera/notSupported";
+
+export default function CameraPage() {
   return (
-    <div>HeritagePreviewPage</div>
-  )
+    <Box>
+      <NotSupported />
+    </Box>
+  );
 }
-
-export default HeritagePreviewPage
