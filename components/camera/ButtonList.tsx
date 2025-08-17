@@ -4,7 +4,7 @@ import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseIcon from "@mui/icons-material/Close";
 import CustomButton from "../CustomComponent/CameraBtn";
 
-const ButtonList = ({ fullScreen }: { fullScreen:  () => void}) => {
+const ButtonList = ({ fullScreen, change }: { fullScreen:  () => void, change: (event: Event, newValue: number | number[]) => void }) => {
   return (
     <Box
       sx={{
@@ -30,6 +30,7 @@ const ButtonList = ({ fullScreen }: { fullScreen:  () => void}) => {
         }}
       >
         <Slider
+          onChange={change}
           orientation="vertical"
           defaultValue={50}
           aria-label="Image Range"

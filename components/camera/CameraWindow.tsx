@@ -1,20 +1,79 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Box, Button, IconButton, Slider, Typography } from "@mui/material";
-import OpenInFullIcon from "@mui/icons-material/OpenInFull";
-import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
-import CloseIcon from "@mui/icons-material/Close";
+import { Box } from "@mui/material";
 import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
 import ButtonList from "./ButtonList";
 import CameraBtn from "@/components/CustomComponent/CameraBtn";
 import Summary from "./Summary";
+import AccessFail from "./AccessFail";
+import LoadingPage from "../feedback/LoadingPage";
+import CameraStream from "./CameraStream";
+import LoadingPermission from "./LoadingPermission";
+
+const userCameraConfig = {
+  video: {
+    facingMode: "environment",
+    aspectRatio: 2,
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+  },
+  audio: false,
+};
 
 const CameraWindow = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasParentRef = useRef<HTMLDivElement | null>(null);
+  const [cameraAccess, setCameraAccess] = useState<boolean | null>(null);
   const [showSummary, setShowSummary] = useState<boolean>(false);
+  const [sliderValue, setSliderValue] = useState<number | number[]>(50);
+
+  // ask permission for media access
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia(userCameraConfig)
+      .then((stream) => {
+        setCameraAccess(true);
+      })
+      .catch((error) => {
+        setCameraAccess(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    // check if canvas available
+    // const canvas = canvasRef.current;
+    // if (!canvas) return;
+    // // set canvas width and height
+    // canvas.width = canvas.parentElement?.clientWidth || 800;
+    // canvas.height = canvas.parentElement?.clientHeight || 400;
+    // const canvasContext = canvas.getContext("2d");
+    // if (!canvasContext) return;
+    // navigator.mediaDevices
+    //   .getUserMedia(userCameraConfig)
+    //   .then((stream) => {
+    //     const video = document.createElement("video");
+    //     video.srcObject = stream;
+    //     video.play();
+    //     const draw = () => {
+    //       if (!canvasRef.current || !canvasContext) return;
+    //       canvasContext.drawImage(
+    //         video,
+    //         0,
+    //         0,
+    //         canvasRef.current.width,
+    //         canvasRef.current.height
+    //       );
+    //       requestAnimationFrame(draw);
+    //     };
+    //     draw();
+    //   })
+    //   .catch((error) => {
+    //     setCameraAccess(false);
+    //     console.log('camera access error ', error)
+    //   });
+  }, []);
 
   // full screen mode toggle
-   const toggleFullscreen = (): void => {
+  const toggleFullscreen = (): void => {
     const el: HTMLElement = document.documentElement;
 
     if (
@@ -42,58 +101,20 @@ const CameraWindow = () => {
     }
   };
 
+  const handleSliderChange = (event: Event, newValue: number | number[]) => {
+    setSliderValue(newValue);
+  };
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexFlow: "row wrap",
-        overflow: "hidden",
-        width: "100vw",
-        height: "100svh",
-      }}
-    >
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "55px 1fr",
-          gridTemplateRows: "1fr",
-          justifyContent: "center",
-          alignItems: "stretch",
-          flex: "1",
-          position: "relative",
-        }}
-      >
-        <ButtonList fullScreen={toggleFullscreen} />
-
-        <Box
-          sx={{
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
-            width: "100%",
-          }}
-        >
-          <canvas
-            style={{ backgroundColor: "#111", aspectRatio: "2 / 1" }}
-            id="canvas"
-          ></canvas>
-        </Box>
-
-        {/* summary trigger btn  */}
-        <CameraBtn
-          variant="contained"
-          color="info"
-          sx={{ position: "absolute", top: "10px", right: "10px" }}
-          onClick={() => setShowSummary((prev) => !prev)}
-        >
-          <DocumentScannerIcon />
-        </CameraBtn>
-      </Box>
-
-      {showSummary && <Summary />}
-    </Box>
+    <>
+      {cameraAccess === null ? (
+        <LoadingPermission />
+      ) : cameraAccess ? (
+        <CameraStream />
+      ) : (
+        <AccessFail />
+      )}
+    </>
   );
 };
 

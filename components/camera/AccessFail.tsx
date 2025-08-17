@@ -9,11 +9,12 @@ const AccessFail = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: "100vh",
+        paddingTop: '25px',
+        paddingBottom: '25px'
       }}
     >
       <Box component={"div"}>
-        <Typography sx={{ padding: "10px" }}>
+        <Typography sx={{ padding: "10px", fontSize: '20px' }} variant="h6">
           # Getting camera access fail. We need your camera access to continue.
         </Typography>
         <Box sx={{ marginLeft: "50px", marginTop: "20px" }}>
