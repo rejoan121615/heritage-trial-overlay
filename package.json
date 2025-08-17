@@ -33,6 +33,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.3",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "react-hook-form": "^7.62.0",
     "tailwindcss": "^4",
     "typescript": "^5"

@@ -11,6 +11,23 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    rules: {
+      // Force import paths to match exact file casing
+      "import/no-unresolved": "error",
+    },
+    settings: {
+      "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+        typescript: {
+          alwaysTryTypes: true,
+        },
+      },
+       "import/ignore": ["node_modules", "\\.json$"], // ← add it here
+    },
+  },
 ];
 
 export default eslintConfig;
