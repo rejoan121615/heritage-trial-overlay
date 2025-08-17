@@ -1,14 +1,7 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Box } from "@mui/material";
-import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
-import ButtonList from "./ButtonList";
-import CameraBtn from "@/components/CustomComponent/CameraBtn";
-import Summary from "./Summary";
+import React, {  useState, useEffect } from "react";
 import AccessFail from "./AccessFail";
-import LoadingPage from "../feedback/LoadingPage";
 import CameraStream from "./CameraStream";
 import LoadingPermission from "./LoadingPermission";
-import { HeritageDataTYPE } from "@/types/AllTypes";
 
 const userCameraConfig = {
   video: {
@@ -20,7 +13,7 @@ const userCameraConfig = {
   audio: false,
 };
 
-const CameraWindow = ({ heritageData } : {heritageData: HeritageDataTYPE | null}) => {
+const CameraWindow = () => {
   const [cameraAccess, setCameraAccess] = useState<boolean | null>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
 
@@ -34,7 +27,7 @@ const CameraWindow = ({ heritageData } : {heritageData: HeritageDataTYPE | null}
         setCameraStream(stream);
         setCameraAccess(true);
       })
-      .catch((error) => {
+      .catch(() => {
         setCameraAccess(false);
       });
   }, []);

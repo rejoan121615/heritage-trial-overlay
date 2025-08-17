@@ -14,7 +14,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import { NavList } from "../AdminNav-data";
 import Link from "next/link";
 import UserProfile from "@/components/userProfile";
@@ -60,7 +59,7 @@ const AdminNav = () => {
         <Toolbar></Toolbar>
         <Divider />
         <List>
-          {NavList.map((Item, index) => {
+          {NavList.map((Item) => {
             return (
               <ListItem key={Item.id} disablePadding>
                 <Link

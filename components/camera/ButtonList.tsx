@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Slider, Button, IconButton } from "@mui/material";
+import { Box, Slider } from "@mui/material";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseIcon from "@mui/icons-material/Close";
 import CustomButton from "../CustomComponent/CameraBtn";

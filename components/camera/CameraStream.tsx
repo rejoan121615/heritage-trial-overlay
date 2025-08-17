@@ -4,9 +4,7 @@ import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
 import ButtonList from "./ButtonList";
 import CameraBtn from "@/components/CustomComponent/CameraBtn";
 import Summary from "./Summary";
-import foxtonImage from "@/public/icons/foxton_image.jpg";
 import { CameraContext } from "@/contexts/CameraContext";
-import { CameraContextTYPE } from "@/types/AllTypes";
 
 const CameraStream = ({
   cameraStream,
@@ -55,13 +53,13 @@ const CameraStream = ({
         requestAnimationFrame(draw);
       };
       draw();
-    } 
+    }
   }, [cameraStream, heritageData]);
 
   //   observer to adjust canvas size
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
+      for (const entry of entries) {
         if (entry.target === canvasParentRef.current) {
           const { width: parentWidth, height: parentHeight } =
             entry.contentRect;
@@ -103,27 +101,17 @@ const CameraStream = ({
     const el: HTMLElement = document.documentElement;
 
     if (
-      document.fullscreenElement ||
-      (document as any).webkitFullscreenElement || // Safari
-      (document as any).msFullscreenElement // IE11
+      document.fullscreenElement 
     ) {
       // Exit full screen
       if (document.exitFullscreen) {
         document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
-      } else if ((document as any).msExitFullscreen) {
-        (document as any).msExitFullscreen();
       }
     } else {
       // Enter full screen
       if (el.requestFullscreen) {
         el.requestFullscreen();
-      } else if ((el as any).webkitRequestFullscreen) {
-        (el as any).webkitRequestFullscreen();
-      } else if ((el as any).msRequestFullscreen) {
-        (el as any).msRequestFullscreen();
-      }
+      } 
     }
   };
 

@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, List, Typography, ListItem } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
 
 const AccessFail = () => {
   return (
@@ -9,14 +8,16 @@ const AccessFail = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        paddingTop: '25px',
-        paddingBottom: '25px'
+        paddingTop: "25px",
+        paddingBottom: "25px",
       }}
     >
       <Box component={"div"}>
-        <Typography sx={{ padding: "10px", fontSize: '20px' }} variant="h6">
+        <Typography sx={{ padding: "10px", fontSize: "20px" }} variant="h6">
           # Getting camera access fail. We need your camera access to continue.
         </Typography>
+
+        {/* iOS Safari instructions */}
         <Box sx={{ marginLeft: "50px", marginTop: "20px" }}>
           <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
             iOS (Safari):
@@ -27,7 +28,7 @@ const AccessFail = () => {
               <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
                 Settings
               </strong>
-              →
+              →{" "}
               <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
                 Safari
               </strong>
@@ -36,13 +37,14 @@ const AccessFail = () => {
               Tap
               <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
                 Camera
-              </strong>{" "}
-              → Set to "Ask" or "Allow"
+              </strong>
+              &nbsp;→ Set to &quot;Ask&quot; or &quot;Allow&quot;
             </ListItem>
             <ListItem>Return to Safari and reload the page</ListItem>
           </List>
         </Box>
 
+        {/* Android Chrome instructions */}
         <Box sx={{ marginLeft: "50px", marginTop: "20px" }}>
           <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
             Android (Chrome):
@@ -52,8 +54,7 @@ const AccessFail = () => {
             <ListItem>
               Select{" "}
               <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
-                {" "}
-                Permissions{" "}
+                Permissions
               </strong>{" "}
               or{" "}
               <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
@@ -65,7 +66,7 @@ const AccessFail = () => {
               <strong style={{ marginLeft: "5px", marginRight: "5px" }}>
                 Camera
               </strong>{" "}
-              to "Allow"
+              to &quot;Allow&quot;
             </ListItem>
             <ListItem>Reload the page</ListItem>
           </List>

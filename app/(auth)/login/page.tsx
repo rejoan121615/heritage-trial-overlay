@@ -1,18 +1,16 @@
 "use client";
 
-import { InputAdornment, Snackbar, TextField } from "@mui/material";
+import { InputAdornment, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import FormWrapper from "@/components/form/FormWrap";
 import { useForm } from "react-hook-form";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import KeyIcon from "@mui/icons-material/Key";
-import z, { set } from "zod";
+import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
-import { useAuth } from "@/contexts/AuthContext";
-import LoadingPage from "@/components/feedback/LoadingPage";
 import { useRouter } from "next/navigation";
 
 const LoginSchema = z.object({

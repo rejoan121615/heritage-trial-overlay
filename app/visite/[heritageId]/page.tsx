@@ -3,16 +3,15 @@
 import { Box } from "@mui/material";
 import NotSupported from "@/components/camera/NotSupported";
 import RotateScreen from "@/components/camera/RotateScreen";
-import AccessFail from "@/components/camera/AccessFail";
 import CameraWindow from "@/components/camera/CameraWindow";
+import HeritageNotFound from "@/components/camera/HeritageNotFound";
 import { useEffect, useState } from "react";
 import LoadingPage from "@/components/feedback/LoadingPage";
 import { useParams } from "next/navigation";
-import { collection, doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/firebase/firebaseConfig";
+import {  doc, getDoc } from "firebase/firestore";
+import {  db } from "@/firebase/firebaseConfig";
 import { HeritageDataTYPE } from "@/types/AllTypes";
 import { CameraContext } from "@/contexts/CameraContext";
-import HeritageNotFound from "@/components/camera/HeritageNotFound";
 
 export default function CameraPage() {
   const [heritageData, setSeritageData] = useState<HeritageDataTYPE | null>(
@@ -42,8 +41,10 @@ export default function CameraPage() {
       }
     };
 
-    fetchData();
-  }, []);
+    if (heritageId) {
+      fetchData();
+    }
+  }, [heritageId]);
 
   useEffect(() => {
     // control mobile state
@@ -51,8 +52,7 @@ export default function CameraPage() {
       /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) &&
       navigator.maxTouchPoints > 1;
 
-    // setMobile(isMobile());
-    setMobile(true);
+    setMobile(isMobile());
 
     // get landscape state
     const isLandscape = () =>
@@ -81,7 +81,7 @@ export default function CameraPage() {
         <CameraContext.Provider value={{ heritageData }}>
           <Box>
             {mobile && landscape ? (
-              <CameraWindow heritageData={heritageData} />
+              <CameraWindow />
             ) : !mobile ? (
               <NotSupported />
             ) : !landscape ? (

@@ -6,13 +6,11 @@ import {
   Box,
   List,
   ListItem,
-  ListItemButton,
   ListItemText,
   Button,
-  IconButton,
 } from "@mui/material";
 import Image from "next/image";
-import { collection, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { HeritageDataTYPE } from "@/types/AllTypes";
 import QRCode from "qrcode";
@@ -58,11 +56,16 @@ const HeritageDetailsPage = ({
             ...docSnapshot.data(),
           } as HeritageDataTYPE);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error fetching heritage data:", error);
+        setHeritage(undefined);
+      }
     };
 
-    fetchDocument();
-  }, []);
+    if (heritageId) { 
+      fetchDocument();
+    }
+  }, [heritageId]);
 
   const qrCodeDownloadHandler = () => {
     if (qrCanvasRef.current) {

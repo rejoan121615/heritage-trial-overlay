@@ -34,7 +34,7 @@ const RegisterPage = () => {
   const {
     handleSubmit,
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterFormTYPE>({
     resolver: zodResolver(RegisterSchema),
     mode: "all",

@@ -16,7 +16,9 @@ const HeritageNotFound = () => {
     >
       <ErrorIcon sx={{ fontSize: "80px", marginBottom: "15px" }} />
       <Typography variant="h6">Sorry, heritage not found.</Typography>
-      <Typography variant="h6">Either it's deleted or does not exists</Typography>
+      <Typography variant="h6">
+        Either it&apos;s deleted or does not exist
+      </Typography>
     </Box>
   );
 };
