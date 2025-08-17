@@ -1,10 +1,12 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import { Box } from "@mui/material";
 import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
 import ButtonList from "./ButtonList";
 import CameraBtn from "@/components/CustomComponent/CameraBtn";
 import Summary from "./Summary";
 import foxtonImage from "@/public/icons/foxton_image.jpg";
+import { CameraContext } from "@/contexts/CameraContext";
+import { CameraContextTYPE } from "@/types/AllTypes";
 
 const CameraStream = ({
   cameraStream,
@@ -15,6 +17,7 @@ const CameraStream = ({
   const canvasParentRef = useRef<HTMLDivElement | null>(null);
   const [showSummary, setShowSummary] = useState<boolean>(false);
   const [slider, setSlider] = useState<number>(0.5);
+  const { heritageData } = useContext(CameraContext);
 
   // use slider value as ref to get the latest value
   const sliderRef = useRef(slider);
@@ -24,32 +27,36 @@ const CameraStream = ({
   }, [slider]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (!canvas || !context || !cameraStream) return;
+    if (heritageData) {
+      const canvas = canvasRef.current;
+      const context = canvas?.getContext("2d");
+      if (!canvas || !context || !cameraStream) return;
 
-    const video = document.createElement("video");
-    video.srcObject = cameraStream;
-    video.play();
+      const video = document.createElement("video");
+      video.srcObject = cameraStream;
+      video.play();
 
-    const OverlayImage = new Image();
-    OverlayImage.src = foxtonImage.src;
+      // if (heritageData === null ) return ;
+      const OverlayImage = new Image();
+      // OverlayImage.src = foxtonImage.src;
+      OverlayImage.src = heritageData.image;
 
-    const draw = () => {
-      if (!canvas || !context) return;
+      const draw = () => {
+        if (!canvas || !context) return;
 
-      context.globalAlpha = 1;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.globalAlpha = 1;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Draw overlay image with dynamic opacity
-      context.globalAlpha = sliderRef.current;
-      context.drawImage(OverlayImage, 0, 0, canvas.width, canvas.height);
+        // Draw overlay image with dynamic opacity
+        context.globalAlpha = sliderRef.current;
+        context.drawImage(OverlayImage, 0, 0, canvas.width, canvas.height);
 
-      context.globalAlpha = 1;
-      requestAnimationFrame(draw);
-    };
-    draw();
-  }, [cameraStream]);
+        context.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      };
+      draw();
+    } 
+  }, [cameraStream, heritageData]);
 
   //   observer to adjust canvas size
   useEffect(() => {

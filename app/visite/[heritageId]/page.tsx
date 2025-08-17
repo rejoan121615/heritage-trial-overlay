@@ -7,10 +7,43 @@ import AccessFail from "@/components/camera/AccessFail";
 import CameraWindow from "@/components/camera/CameraWindow";
 import { useEffect, useState } from "react";
 import LoadingPage from "@/components/feedback/LoadingPage";
+import { useParams } from "next/navigation";
+import { collection, doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/firebase/firebaseConfig";
+import { HeritageDataTYPE } from "@/types/AllTypes";
+import { CameraContext } from "@/contexts/CameraContext";
+import HeritageNotFound from "@/components/camera/HeritageNotFound";
 
 export default function CameraPage() {
+  const [heritageData, setSeritageData] = useState<HeritageDataTYPE | null>(
+    null
+  );
+  const [heritageNotFound, setHeritageNotFound] = useState<boolean | null>(
+    null
+  );
+  const { heritageId } = useParams<{ heritageId: string }>();
   const [mobile, setMobile] = useState<boolean | null>(null);
   const [landscape, setLandscape] = useState<boolean | null>(null);
+
+  // pull record from database
+  useEffect(() => {
+    const fetchData = async () => {
+      const docRef = doc(db, "heritages", heritageId);
+      const docSnapshort = await getDoc(docRef);
+
+      if (docSnapshort.exists()) {
+        setHeritageNotFound(false);
+        setSeritageData({
+          id: docSnapshort.id,
+          ...docSnapshort.data(),
+        } as HeritageDataTYPE);
+      } else {
+        setHeritageNotFound(true);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     // control mobile state
@@ -38,18 +71,24 @@ export default function CameraPage() {
 
   return (
     <>
-      {mobile === null && landscape === null ? (
+      {heritageNotFound === null ? (
+        <LoadingPage />
+      ) : heritageNotFound ? (
+        <HeritageNotFound />
+      ) : mobile === null && landscape === null ? (
         <LoadingPage />
       ) : (
-        <Box>
-          {mobile && landscape ? (
-            <CameraWindow />
-          ) : !mobile ? (
-            <NotSupported />
-          ) : !landscape ? (
-            <RotateScreen />
-          ) : null}
-        </Box>
+        <CameraContext.Provider value={{ heritageData }}>
+          <Box>
+            {mobile && landscape ? (
+              <CameraWindow heritageData={heritageData} />
+            ) : !mobile ? (
+              <NotSupported />
+            ) : !landscape ? (
+              <RotateScreen />
+            ) : null}
+          </Box>
+        </CameraContext.Provider>
       )}
     </>
   );

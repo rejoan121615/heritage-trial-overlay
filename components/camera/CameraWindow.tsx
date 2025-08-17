@@ -8,6 +8,7 @@ import AccessFail from "./AccessFail";
 import LoadingPage from "../feedback/LoadingPage";
 import CameraStream from "./CameraStream";
 import LoadingPermission from "./LoadingPermission";
+import { HeritageDataTYPE } from "@/types/AllTypes";
 
 const userCameraConfig = {
   video: {
@@ -19,7 +20,7 @@ const userCameraConfig = {
   audio: false,
 };
 
-const CameraWindow = () => {
+const CameraWindow = ({ heritageData } : {heritageData: HeritageDataTYPE | null}) => {
   const [cameraAccess, setCameraAccess] = useState<boolean | null>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
 

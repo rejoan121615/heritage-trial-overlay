@@ -1,7 +1,6 @@
 import { Timestamp } from 'firebase/firestore'
 
 
-
 export type HeritageDataTYPE = {
     id: string;
     title: string;
@@ -12,3 +11,8 @@ export type HeritageDataTYPE = {
     userId: string;
     createdAt: Timestamp;
 }
+
+
+export type CameraContextTYPE = {
+  heritageData: HeritageDataTYPE | null;
+};
