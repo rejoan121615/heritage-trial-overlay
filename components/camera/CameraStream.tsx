@@ -51,6 +51,46 @@ const CameraStream = ({
     draw();
   }, [cameraStream]);
 
+  //   observer to adjust canvas size
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        if (entry.target === canvasParentRef.current) {
+          const { width: parentWidth, height: parentHeight } =
+            entry.contentRect;
+
+          // Subtract 30px from parent dimensions
+          const maxWidth = parentWidth - 30;
+          const maxHeight = parentHeight - 30;
+
+          // Calculate canvas size keeping 2:1 aspect ratio
+          let canvasWidth = maxWidth;
+          let canvasHeight = canvasWidth / 2;
+
+          // If height overflows, scale based on height
+          if (canvasHeight > maxHeight) {
+            canvasHeight = maxHeight;
+            canvasWidth = canvasHeight * 2;
+          }
+
+          if (!canvasRef.current) return;
+          canvasRef.current.width = canvasWidth;
+          canvasRef.current.height = canvasHeight;
+
+          console.log("canvas size:", canvasWidth, canvasHeight);
+        }
+      }
+    });
+
+    if (canvasParentRef.current) {
+      observer.observe(canvasParentRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   // full screen mode toggle
   const toggleFullscreen = (): void => {
     const el: HTMLElement = document.documentElement;
@@ -81,7 +121,6 @@ const CameraStream = ({
   };
 
   const sliderChangeHandler = (event: Event, newValue: number) => {
-    console.log(newValue / 100);
     setSlider(newValue / 100);
   };
 
@@ -96,6 +135,7 @@ const CameraStream = ({
       }}
     >
       <Box
+        ref={canvasParentRef}
         sx={{
           display: "grid",
           gridTemplateColumns: "55px 1fr",
@@ -112,13 +152,13 @@ const CameraStream = ({
         />
 
         <Box
-          ref={canvasParentRef}
           sx={{
             position: "relative",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             overflow: "hidden",
+            marginRight: showSummary ? "15px" : "55px",
           }}
         >
           <canvas
