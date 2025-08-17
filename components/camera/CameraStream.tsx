@@ -60,7 +60,7 @@ const CameraStream = ({
             entry.contentRect;
 
           // Subtract 30px from parent dimensions
-          const maxWidth = parentWidth - 30;
+          const maxWidth = parentWidth - 140;
           const maxHeight = parentHeight - 30;
 
           // Calculate canvas size keeping 2:1 aspect ratio
