@@ -20,17 +20,17 @@ const userCameraConfig = {
 };
 
 const CameraWindow = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const canvasParentRef = useRef<HTMLDivElement | null>(null);
   const [cameraAccess, setCameraAccess] = useState<boolean | null>(null);
-  const [showSummary, setShowSummary] = useState<boolean>(false);
-  const [sliderValue, setSliderValue] = useState<number | number[]>(50);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+
+
 
   // ask permission for media access
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia(userCameraConfig)
       .then((stream) => {
+        setCameraStream(stream);
         setCameraAccess(true);
       })
       .catch((error) => {
@@ -38,79 +38,13 @@ const CameraWindow = () => {
       });
   }, []);
 
-  useEffect(() => {
-    // check if canvas available
-    // const canvas = canvasRef.current;
-    // if (!canvas) return;
-    // // set canvas width and height
-    // canvas.width = canvas.parentElement?.clientWidth || 800;
-    // canvas.height = canvas.parentElement?.clientHeight || 400;
-    // const canvasContext = canvas.getContext("2d");
-    // if (!canvasContext) return;
-    // navigator.mediaDevices
-    //   .getUserMedia(userCameraConfig)
-    //   .then((stream) => {
-    //     const video = document.createElement("video");
-    //     video.srcObject = stream;
-    //     video.play();
-    //     const draw = () => {
-    //       if (!canvasRef.current || !canvasContext) return;
-    //       canvasContext.drawImage(
-    //         video,
-    //         0,
-    //         0,
-    //         canvasRef.current.width,
-    //         canvasRef.current.height
-    //       );
-    //       requestAnimationFrame(draw);
-    //     };
-    //     draw();
-    //   })
-    //   .catch((error) => {
-    //     setCameraAccess(false);
-    //     console.log('camera access error ', error)
-    //   });
-  }, []);
-
-  // full screen mode toggle
-  const toggleFullscreen = (): void => {
-    const el: HTMLElement = document.documentElement;
-
-    if (
-      document.fullscreenElement ||
-      (document as any).webkitFullscreenElement || // Safari
-      (document as any).msFullscreenElement // IE11
-    ) {
-      // Exit full screen
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
-      } else if ((document as any).msExitFullscreen) {
-        (document as any).msExitFullscreen();
-      }
-    } else {
-      // Enter full screen
-      if (el.requestFullscreen) {
-        el.requestFullscreen();
-      } else if ((el as any).webkitRequestFullscreen) {
-        (el as any).webkitRequestFullscreen();
-      } else if ((el as any).msRequestFullscreen) {
-        (el as any).msRequestFullscreen();
-      }
-    }
-  };
-
-  const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    setSliderValue(newValue);
-  };
 
   return (
     <>
       {cameraAccess === null ? (
         <LoadingPermission />
       ) : cameraAccess ? (
-        <CameraStream />
+        <CameraStream cameraStream={cameraStream} />
       ) : (
         <AccessFail />
       )}

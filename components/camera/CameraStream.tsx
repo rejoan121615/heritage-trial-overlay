@@ -4,15 +4,86 @@ import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
 import ButtonList from "./ButtonList";
 import CameraBtn from "@/components/CustomComponent/CameraBtn";
 import Summary from "./Summary";
-import AccessFail from "./AccessFail";
-import LoadingPage from "../feedback/LoadingPage";
+import foxtonImage from "@/public/icons/foxton_image.jpg";
 
-const CameraStream = () => {
+const CameraStream = ({
+  cameraStream,
+}: {
+  cameraStream: MediaStream | null;
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasParentRef = useRef<HTMLDivElement | null>(null);
-  const [cameraAccess, setCameraAccess] = useState<boolean | null>(null);
   const [showSummary, setShowSummary] = useState<boolean>(false);
-  const [sliderValue, setSliderValue] = useState<number | number[]>(50);
+  const [slider, setSlider] = useState<number>(0.5);
+
+  // use slider value as ref to get the latest value
+  const sliderRef = useRef(slider);
+
+  useEffect(() => {
+    sliderRef.current = slider;
+  }, [slider]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context || !cameraStream) return;
+
+    const video = document.createElement("video");
+    video.srcObject = cameraStream;
+    video.play();
+
+    const OverlayImage = new Image();
+    OverlayImage.src = foxtonImage.src;
+
+    const draw = () => {
+      if (!canvas || !context) return;
+
+      context.globalAlpha = 1;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Draw overlay image with dynamic opacity
+      context.globalAlpha = sliderRef.current;
+      context.drawImage(OverlayImage, 0, 0, canvas.width, canvas.height);
+
+      context.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    };
+    draw();
+  }, [cameraStream]);
+
+  // full screen mode toggle
+  const toggleFullscreen = (): void => {
+    const el: HTMLElement = document.documentElement;
+
+    if (
+      document.fullscreenElement ||
+      (document as any).webkitFullscreenElement || // Safari
+      (document as any).msFullscreenElement // IE11
+    ) {
+      // Exit full screen
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      } else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen();
+      }
+    } else {
+      // Enter full screen
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if ((el as any).webkitRequestFullscreen) {
+        (el as any).webkitRequestFullscreen();
+      } else if ((el as any).msRequestFullscreen) {
+        (el as any).msRequestFullscreen();
+      }
+    }
+  };
+
+  const sliderChangeHandler = (event: Event, newValue: number) => {
+    console.log(newValue / 100);
+    setSlider(newValue / 100);
+  };
 
   return (
     <Box
@@ -35,7 +106,10 @@ const CameraStream = () => {
           position: "relative",
         }}
       >
-        <ButtonList fullScreen={() => {}} change={() => {}} />
+        <ButtonList
+          fullScreen={toggleFullscreen}
+          change={sliderChangeHandler}
+        />
 
         <Box
           ref={canvasParentRef}

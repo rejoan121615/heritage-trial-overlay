@@ -4,7 +4,7 @@ import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseIcon from "@mui/icons-material/Close";
 import CustomButton from "../CustomComponent/CameraBtn";
 
-const ButtonList = ({ fullScreen, change }: { fullScreen:  () => void, change: (event: Event, newValue: number | number[]) => void }) => {
+const ButtonList = ({ fullScreen, change }: { fullScreen:  () => void, change: (event: Event, newValue: number) => void }) => {
   return (
     <Box
       sx={{
