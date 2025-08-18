@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogProps,
   Stack,
   Button,
   TextField,
@@ -26,6 +25,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
 import { categoryOptions, HeritageSchema } from "@/utils/HeritageAssist";
 import Image from "next/image";
+import { uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
 
 const HeritageEditSchema = HeritageSchema.extend({
   image: HeritageSchema.shape.image.optional(),
@@ -37,10 +39,12 @@ const HeritageEditModal = ({
   open,
   close,
   heritageData,
+  setHeritageList
 }: {
   open: boolean;
   close: () => void;
   heritageData: HeritageDataTYPE | undefined;
+  setHeritageList: React.Dispatch<React.SetStateAction<HeritageDataTYPE[] | undefined>>;
 }) => {
   // react form hook
   const {
@@ -61,8 +65,7 @@ const HeritageEditModal = ({
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
-
+  const [dataUpdated, setNoUpdate] = useState<boolean | null>(null);
 
   // update default value
   useEffect(() => {
@@ -93,9 +96,91 @@ const HeritageEditModal = ({
   // Function to upload image to Cloudinary
 
   const submitHandler = async (data: HeritageFormDataTYPE) => {
-    console.log("old heritage data ", heritageData);
-    console.log("submit data ", data);
+    const { title, summary, category, location, image } = data;
+
+    // close modal
     close();
+
+    // find changed fields except "image"
+    const updatedField = Object.keys(data).filter((objKey: string) => {
+      if (objKey === "image") return false;
+      return (
+        data[objKey as keyof typeof data] !==
+        heritageData?.[objKey as keyof typeof heritageData]
+      );
+    });
+
+    // ✅ Case 1: no image and no field change
+    if (!image && updatedField.length === 0) {
+      console.log("No update made");
+      return;
+    }
+
+    const dataUpdater = async () => {
+      let imageUrl: string | null = null;
+
+      // if image updated → upload it first
+      if (image) {
+        imageUrl = await uploadToCloudinary(image);
+      }
+
+      // object to send to firebase
+      let updatePayload: Partial<HeritageDataTYPE> = {};
+
+      // ✅ Case 2: only image
+      if (image && updatedField.length === 0) {
+        updatePayload = { image: imageUrl! };
+      }
+
+      // ✅ Case 3: image + fields
+      if (image && updatedField.length > 0) {
+        updatedField.forEach((field) => {
+          // @ts-ignore
+          updatePayload[field as keyof HeritageDataTYPE] =
+            data[field as keyof HeritageFormDataTYPE];
+        });
+        updatePayload.image = imageUrl!;
+      }
+
+      // ✅ Case 4: only fields
+      if (!image && updatedField.length > 0) {
+        updatedField.forEach((field) => {
+          // @ts-ignore
+          updatePayload[field as keyof HeritageDataTYPE] =
+            data[field as keyof HeritageFormDataTYPE];
+        });
+      }
+
+      // update heritage list state 
+      setHeritageList((prevState) => {
+        if (!prevState?.length) return prevState;
+
+        return prevState.map((item) => {
+          if (item.id === heritageData?.id) {
+            return { ...item, ...updatePayload };
+          }
+          return item;
+        });
+      });
+
+      // finally update in firebase
+      
+
+      try {
+        if (heritageData?.id) {
+          const ref = doc(db, "heritages", heritageData?.id);
+          await updateDoc(ref, updatePayload);
+        }
+      } catch (error) {
+        console.log("document update fail, something went wrong");
+      }
+
+      // reset form into default state
+      reset();
+      setPreviewImage(null);
+    };
+
+    await dataUpdater();
   };
 
   return (
@@ -108,8 +193,8 @@ const HeritageEditModal = ({
       maxWidth="md"
       component={"div"}
     >
-      <DialogTitle id="scroll-dialog-title">Edit Heritage</DialogTitle>
-      <DialogContent>
+      <DialogTitle id="scroll-dialog-title">Edit Heritage </DialogTitle>
+      <DialogContent sx={{ paddingTop: "20px!important" }}>
         <Stack rowGap={3} component={"form"}>
           <TextField
             id="outlined-basic"

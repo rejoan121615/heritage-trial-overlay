@@ -135,6 +135,7 @@ const AllHeritage = () => {
         open={showEdit}
         close={() => setShowEdit(false)}
         heritageData={heritageList?.find(item => item.id === selectedHeritage)}
+        setHeritageList={setHeritageList}
       />
 
       {/* feedback after completing operation  */}
