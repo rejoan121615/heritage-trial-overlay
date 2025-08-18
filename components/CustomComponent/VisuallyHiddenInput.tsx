@@ -1,5 +1,4 @@
 import { styled } from "@mui/material";
-import React from "react";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",

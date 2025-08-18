@@ -65,7 +65,6 @@ const HeritageEditModal = ({
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [dataUpdated, setNoUpdate] = useState<boolean | null>(null);
 
   // update default value
   useEffect(() => {
@@ -77,7 +76,7 @@ const HeritageEditModal = ({
       location: heritageData.location,
       summary: heritageData.summary,
     });
-  }, [heritageData]);
+  }, [heritageData, reset]);
 
   // watch image field for change
   const imageField = useWatch({
@@ -96,7 +95,7 @@ const HeritageEditModal = ({
   // Function to upload image to Cloudinary
 
   const submitHandler = async (data: HeritageFormDataTYPE) => {
-    const { title, summary, category, location, image } = data;
+    const { image } = data;
 
     // close modal
     close();
@@ -135,7 +134,7 @@ const HeritageEditModal = ({
       // ✅ Case 3: image + fields
       if (image && updatedField.length > 0) {
         updatedField.forEach((field) => {
-          // @ts-ignore
+          // @ts-expect-error add those updated updated data into updatePayload object 
           updatePayload[field as keyof HeritageDataTYPE] =
             data[field as keyof HeritageFormDataTYPE];
         });
@@ -145,7 +144,7 @@ const HeritageEditModal = ({
       // ✅ Case 4: only fields
       if (!image && updatedField.length > 0) {
         updatedField.forEach((field) => {
-          // @ts-ignore
+          // @ts-expect-error add those updated updated data into updatePayload object 
           updatePayload[field as keyof HeritageDataTYPE] =
             data[field as keyof HeritageFormDataTYPE];
         });
@@ -172,7 +171,7 @@ const HeritageEditModal = ({
           await updateDoc(ref, updatePayload);
         }
       } catch (error) {
-        console.log("document update fail, something went wrong");
+        console.log("document update fail, something went wrong", error);
       }
 
       // reset form into default state
