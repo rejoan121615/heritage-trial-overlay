@@ -1,0 +1,294 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { HeritageDataTYPE } from "@/types/AllTypes";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogProps,
+  Stack,
+  Button,
+  TextField,
+  Typography,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  FormHelperText,
+  Box,
+  DialogActions,
+  Divider,
+} from "@mui/material";
+import z from "zod";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
+import { categoryOptions, HeritageSchema } from "@/utils/HeritageAssist";
+import Image from "next/image";
+
+const HeritageEditSchema = HeritageSchema.extend({
+  image: HeritageSchema.shape.image.optional(),
+});
+
+type HeritageFormDataTYPE = z.infer<typeof HeritageEditSchema>;
+
+const HeritageEditModal = ({
+  open,
+  close,
+  heritageData,
+}: {
+  open: boolean;
+  close: () => void;
+  heritageData: HeritageDataTYPE | undefined;
+}) => {
+  // react form hook
+  const {
+    handleSubmit,
+    register,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<HeritageFormDataTYPE>({
+    resolver: zodResolver(HeritageEditSchema),
+    mode: "all",
+    defaultValues: {
+      title: "",
+      category: "",
+      location: "",
+      summary: "",
+    },
+  });
+
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+
+
+  // update default value
+  useEffect(() => {
+    if (heritageData == undefined) return;
+
+    reset({
+      title: heritageData.title,
+      category: heritageData.category,
+      location: heritageData.location,
+      summary: heritageData.summary,
+    });
+  }, [heritageData]);
+
+  // watch image field for change
+  const imageField = useWatch({
+    control,
+    name: "image",
+  });
+
+  useEffect(() => {
+    if (!imageField) return;
+
+    setPreviewImage(URL.createObjectURL(imageField));
+
+    console.log("Your new image value ", imageField);
+  }, [imageField]);
+
+  // Function to upload image to Cloudinary
+
+  const submitHandler = async (data: HeritageFormDataTYPE) => {
+    console.log("old heritage data ", heritageData);
+    console.log("submit data ", data);
+    close();
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={close}
+      aria-labelledby="scroll-dialog-title"
+      aria-describedby="scroll-dialog-description"
+      fullWidth
+      maxWidth="md"
+      component={"div"}
+    >
+      <DialogTitle id="scroll-dialog-title">Edit Heritage</DialogTitle>
+      <DialogContent>
+        <Stack rowGap={3} component={"form"}>
+          <TextField
+            id="outlined-basic"
+            label="Heritage Title:"
+            variant="outlined"
+            fullWidth
+            {...register("title")}
+            error={!!errors.title}
+            helperText={errors.title?.message}
+          />
+          <TextField
+            label="Heritage Summary: "
+            multiline
+            rows={5}
+            margin="normal"
+            fullWidth
+            sx={{ margin: "0px" }}
+            {...register("summary")}
+            error={!!errors.summary}
+            helperText={errors.summary?.message}
+          />
+
+          <TextField
+            id="outlined-basic"
+            label="Location:"
+            variant="outlined"
+            fullWidth
+            {...register("location")}
+            error={!!errors.location}
+            helperText={errors.location?.message}
+          />
+
+          <Controller
+            name="category"
+            control={control}
+            defaultValue="ruins"
+            render={({ field }) => {
+              return (
+                <FormControl fullWidth error={!!errors.category}>
+                  <InputLabel id="select-category-label">
+                    Select Category
+                  </InputLabel>
+                  <Select
+                    labelId="select-category-label"
+                    value={field.value}
+                    onChange={field.onChange}
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    {categoryOptions.map((catItem, index) => (
+                      <MenuItem
+                        key={index}
+                        value={catItem}
+                        sx={{ textTransform: "capitalize" }}
+                      >
+                        {catItem}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.category ? (
+                    <FormHelperText>{errors.category.message}</FormHelperText>
+                  ) : null}
+                </FormControl>
+              );
+            }}
+          />
+
+          <Divider />
+          {/* Image upload section */}
+          {heritageData !== undefined && heritageData.image && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-around",
+              }}
+            >
+              {/* current image  */}
+              <Box>
+                <Image
+                  width={200}
+                  height={200}
+                  src={heritageData?.image}
+                  alt="Heritage Image"
+                />
+                <Typography
+                  variant="subtitle1"
+                  textAlign="center"
+                  sx={{ marginTop: "10px" }}
+                >
+                  Current Heritage Image:
+                </Typography>
+              </Box>
+              {/* current image  */}
+              {previewImage !== null && (
+                <Box>
+                  <Image
+                    width={200}
+                    height={200}
+                    src={previewImage}
+                    alt="Heritage Image"
+                  />
+                  <Typography
+                    variant="subtitle1"
+                    textAlign="center"
+                    sx={{ marginTop: "10px" }}
+                  >
+                    New Heritage Image:
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          )}
+          <Divider />
+
+          <Controller
+            name="image"
+            control={control}
+            render={({ field }) => {
+              return (
+                <Box
+                  component="div"
+                  sx={{ display: "flex", flexFlow: "column wrap" }}
+                >
+                  <Button
+                    component="label"
+                    role={undefined}
+                    variant="outlined"
+                    tabIndex={-1}
+                    size="large"
+                    sx={{
+                      padding: "15px 0px",
+                      color: errors.image ? "#db2f4f" : "#676767",
+                      borderColor: errors.image ? "#db2f4f" : "#c4c4c4",
+                      "&:hover": { borderColor: "#212121" },
+                    }}
+                  >
+                    {field.value
+                      ? `Selected File: ${field.value.name}`
+                      : "Upload Image"}
+                    <VisuallyHiddenInput
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          field.onChange(e.target.files[0]);
+                        }
+                      }}
+                    />
+                  </Button>
+                  {errors.image && (
+                    <Typography
+                      color="error"
+                      variant="caption"
+                      sx={{ marginLeft: "15px" }}
+                    >
+                      {errors.image.message}
+                    </Typography>
+                  )}
+                </Box>
+              );
+            }}
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={close} variant="contained" color="error">
+          Cancel
+        </Button>
+        <Button
+          sx={{ marginLeft: "20px" }}
+          variant="contained"
+          color="success"
+          onClick={handleSubmit(submitHandler)}
+        >
+          Submit Change
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default HeritageEditModal;

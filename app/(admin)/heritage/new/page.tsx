@@ -23,39 +23,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db, auth } from "@/firebase/firebaseConfig";
 import { useRouter } from 'next/navigation';
-
-const categoryOptions = [
-  "ruins",
-  "monastery",
-  "palace",
-  "mosque",
-  "historic town",
-  "temple",
-  "museum",
-  "church",
-  "architecture",
-  "residence",
-];
+import { categoryOptions, HeritageSchema } from "@/utils/HeritageAssist";
+import { uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
 
 
-const NewHeritageSchema = z.object({
-  title: z.string().nonempty("Title is required."),
-  summary: z.string().nonempty("Summary is required."),
-  location: z.string().nonempty("Location is required."),
-  category: z.enum(categoryOptions, {
-    message: "Please select a valid category",
-  }),
-  image: z
-    .instanceof(File, { message: "Please upload a file" })
-    .refine((file) => file.size <= 10 * 1024 * 1024, {
-      message: "File size must be less than 10MB",
-    })
-    .refine((file) => file.type.startsWith("image/"), {
-      message: "Only image files are allowed",
-    }),
-});
 
-type HeritageFormDataTYPE = z.infer<typeof NewHeritageSchema>;
+
+
+
+type HeritageFormDataTYPE = z.infer<typeof HeritageSchema>;
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -80,35 +56,13 @@ const NewHeritagePage = () => {
     control,
     formState: { errors },
   } = useForm<HeritageFormDataTYPE>({
-    resolver: zodResolver(NewHeritageSchema),
+    resolver: zodResolver(HeritageSchema),
     mode: "all",
   });
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Function to upload image to Cloudinary
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "heritage_uploads"); // Create this preset in Cloudinary dashboard
-    formData.append("folder", "heritage-sites"); // Optional: organize images in folders
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || "Upload failed");
-    }
-
-    const data = await response.json();
-    return data.secure_url; // Return the image URL
-  };
+  
 
   const submitHandler = async (data: HeritageFormDataTYPE) => {
     setLoading(true); // active loading on submit button
@@ -147,7 +101,7 @@ const NewHeritagePage = () => {
         component={"h2"}
         sx={{ fontSize: "20px", margin: "0px 0 30px 0" }}
       >
-        Update your heritage
+        Add New Heritage
       </Typography>
       <Stack
         rowGap={3}

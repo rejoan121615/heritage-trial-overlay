@@ -9,18 +9,26 @@ import { db } from "@/firebase/firebaseConfig";
 import LoadingPage from "@/components/feedback/LoadingPage";
 import DeleteConfirmationDialog from "@/components/feedback/DeleteConfirmationDialog";
 import FeedbackSnackbar from "@/components/feedback/FeedbackSnackbar";
+import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";
 
 const AllHeritage = () => {
   const [heritageList, setHeritageList] = useState<HeritageDataTYPE[]>();
   const [loading, setLoading] = useState<boolean>(true);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
     useState<boolean>(false);
-  const [heritageToDelete, setHeritageToDelete] = useState<string | null>(null);
+  const [selectedHeritage, setSelectedHeritage] = useState<string | null>(null);
   const [deleteFeedback, setDeleteFeedback] = useState<FeedbackSnackbarTYPE>({
     open: false,
     title: "",
     alertType: "success",
   });
+  const [showEdit, setShowEdit] = useState<boolean>(false);
+
+
+
+
+
+
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -48,27 +56,28 @@ const AllHeritage = () => {
     fetchPosts();
   }, []);
 
-  const editHeritageHandler = (id: string) => {
-    console.log("Edit heritage with id:", id);
+  const showEditHeritageHandler = (id: string) => {
+    setShowEdit(true);
+    setSelectedHeritage(id);
   };
 
   const confirmBeforeDeleteHandler = (id: string) => {
     setDeleteConfirmationOpen(true);
-    setHeritageToDelete(id);
+    setSelectedHeritage(id);
   };
 
   const deleteHeritageHandler = () => {
-    if (heritageToDelete && deleteConfirmationOpen) {
+    if (selectedHeritage && deleteConfirmationOpen) {
       setDeleteConfirmationOpen(false); // hide the confirm box 
 
       // start database operation 
-      const document = doc(db, "heritages", heritageToDelete);
+      const document = doc(db, "heritages", selectedHeritage);
 
       deleteDoc(document)
         .then(() => {
-          setHeritageToDelete(null);
+          setSelectedHeritage(null);
           setHeritageList((prevState) => {
-            return prevState?.filter((item) => item.id !== heritageToDelete);
+            return prevState?.filter((item) => item.id !== selectedHeritage);
           });
 
           setDeleteFeedback({
@@ -107,7 +116,7 @@ const AllHeritage = () => {
               <Grid key={heritage.id} size={{ xl: 3 }}>
                 <HeritageCard
                   data={heritage}
-                  edit={editHeritageHandler}
+                  showEditForm={showEditHeritageHandler}
                   delete={confirmBeforeDeleteHandler}
                 />
               </Grid>
@@ -122,6 +131,13 @@ const AllHeritage = () => {
         onDelete={deleteHeritageHandler}
       />
 
+      <HeritageEditModal
+        open={showEdit}
+        close={() => setShowEdit(false)}
+        heritageData={heritageList?.find(item => item.id === selectedHeritage)}
+      />
+
+      {/* feedback after completing operation  */}
       <FeedbackSnackbar
         open={deleteFeedback?.open}
         title={deleteFeedback?.title}
