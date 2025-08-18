@@ -16,3 +16,10 @@ export type HeritageDataTYPE = {
 export type CameraContextTYPE = {
   heritageData: HeritageDataTYPE | null;
 };
+
+
+export type FeedbackSnackbarTYPE = {
+  open: boolean;
+  title: string;
+  alertType: "success" | "error" | "warning" | "info" ;
+};

@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import { HeritageDataTYPE } from "@/types/AllTypes";
 import Link from "next/link";
 
-const HeritageCard = ( { data } : { data : HeritageDataTYPE } ) => {
+const HeritageCard = ( { data, edit, delete: deleteHeritage } : { data : HeritageDataTYPE, edit: (id: string) => void, delete: (id: string) => void } ) => {
   return (
     <Card sx={{ width: '100%' }}>
       <CardMedia
@@ -30,8 +30,8 @@ const HeritageCard = ( { data } : { data : HeritageDataTYPE } ) => {
         <Link href={`/heritage/${data.id}`}>
           <Button size="small" variant="contained" color="secondary">details</Button>
         </Link>
-        <Button size="small" variant="contained" color="info">edit</Button>
-        <Button size="small" variant="contained" color="warning">delete</Button>
+        <Button size="small" variant="contained" color="info" onClick={() => edit(data.id)}>edit</Button>
+        <Button size="small" variant="contained" color="warning" onClick={() => deleteHeritage(data.id)}>delete</Button>
       </CardActions>
     </Card>
   );

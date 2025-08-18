@@ -39,7 +39,7 @@ const categoryOptions = [
 
 
 const NewHeritageSchema = z.object({
-  title: z.string().min(10, "Title must be atleast 10 character long."),
+  title: z.string().nonempty("Title is required."),
   summary: z.string().nonempty("Summary is required."),
   location: z.string().nonempty("Location is required."),
   category: z.enum(categoryOptions, {
