@@ -61,7 +61,9 @@ const UserListPage = ({
               </TableCell>
               <TableCell>
                 {currentUser?.uid === user.userId ? (
-                  <Chip label="Your Data" color="secondary"  />
+                  <Chip label="Your Data" color="secondary" />
+                ) : user.isAdmin ? (
+                  <Chip label="Admin" color="primary" />
                 ) : (
                   <>
                     {user.status === "pending" ? (

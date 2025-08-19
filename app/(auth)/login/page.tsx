@@ -10,8 +10,10 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
+import { auth, db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { UserTYPE } from "@/types/AllTypes";
 
 const LoginSchema = z.object({
   email: z.email("Invalid email address."),
@@ -45,8 +47,32 @@ const LoginPage = () => {
     setSubmitProgress(true);
     const { email, password } = data;
     try {
+      // check user status before signin
+      const userQuery = query(
+        collection(db, "users"),
+        where("email", "==", email)
+      );
+      const userDocSnapshort = await getDocs(userQuery);
+      if (userDocSnapshort.empty) {
+        setError("email", {
+          message: "Invalid email, check the email address.",
+        });
+        return;
+      }
+
+      const retrivedUserData = userDocSnapshort.docs[0].data() as UserTYPE;
+
+      // account block handler
+      if (retrivedUserData.status === "block") {
+        setError("email", {
+          message: "Your account is blocked. Contact with admin.",
+        });
+        setSubmitProgress(false);
+        return;
+      }
+
+      // do signin operation
       const res = await signInWithEmailAndPassword(auth, email, password);
-      console.log(res);
 
       if (res.user) {
         router.push("/heritage");
