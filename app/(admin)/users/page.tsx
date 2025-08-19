@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import UserTable from "@/components/admin/UserTable";
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, doc, getDocs, query, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { UserTYPE } from "@/types/AllTypes";
 import UserSkeleton from "@/components/feedback/UserSkeleton";
@@ -20,6 +20,7 @@ import UserSkeleton from "@/components/feedback/UserSkeleton";
 const UserListPage = () => {
   const [userList, setUserList] = useState<UserTYPE[] | null>(null);
 
+  // fetch user from db
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -47,13 +48,47 @@ const UserListPage = () => {
     fetchUsers();
   }, []);
 
+  // handler user actions
+  const userStatusHandler = async (
+    userId: string,
+    action: UserTYPE["status"]
+  ) => {
+    setUserList((prevState) => {
+      const updatedUserState = prevState?.map((user) => {
+        if (user.userId === userId) {
+          return {
+            ...user,
+            status: action,
+          } as UserTYPE;
+        } else {
+          return user;
+        }
+      });
+
+      if (updatedUserState) return updatedUserState;
+
+      return prevState;
+    });
+
+    try {
+      const docRef = doc(db, "users", userId);
+      await updateDoc(docRef, { status: action });
+    } catch (error) {
+      console.log("something went wrong ", error);
+    }
+  };
+
   return (
     <>
       <Typography variant="h6" sx={{ marginBottom: "20px" }}>
         User List:
       </Typography>
 
-      {userList === null ? <UserSkeleton /> : <UserTable userList={userList} />}
+      {userList === null ? (
+        <UserSkeleton />
+      ) : (
+        <UserTable userList={userList} onUserStatusChange={userStatusHandler} />
+      )}
     </>
   );
 };

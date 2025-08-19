@@ -10,10 +10,25 @@ import {
   TableHead,
   TableRow,
   Button,
+  Chip,
 } from "@mui/material";
 import { UserTYPE } from "@/types/AllTypes";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/firebaseConfig";
 
-const UserListPage = ({ userList }: { userList: UserTYPE[] | null }) => {
+const UserListPage = ({
+  userList,
+  onUserStatusChange,
+}: {
+  userList: UserTYPE[] | null;
+  onUserStatusChange: (userId: string, action: UserTYPE["status"]) => void;
+}) => {
+  const [currentUser] = useAuthState(auth);
+
+  useEffect(() => {
+    console.log("current user ", currentUser);
+  }, [currentUser]);
+
   return (
     <TableContainer component={Paper} sx={{ borderRadius: "10px" }}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -22,7 +37,8 @@ const UserListPage = ({ userList }: { userList: UserTYPE[] | null }) => {
             <TableCell>User Name</TableCell>
             <TableCell>Email</TableCell>
             <TableCell>Total Heritage</TableCell>
-            <TableCell>Account Created</TableCell>
+            <TableCell>Created</TableCell>
+            <TableCell>Status</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -40,28 +56,56 @@ const UserListPage = ({ userList }: { userList: UserTYPE[] | null }) => {
               <TableCell>
                 {user.createdAt.toDate().toLocaleDateString()}
               </TableCell>
+              <TableCell sx={{ textTransform: "capitalize" }}>
+                {user.status}
+              </TableCell>
               <TableCell>
-                {user.status === "pending" ? (
-                  <>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      sx={{ marginRight: "10px" }}
-                    >
-                      Approve
-                    </Button>
-                    <Button variant="contained" color="error">
-                      Reject
-                    </Button>
-                  </>
-                ) : user.status === "active" ? (
-                  <Button variant="contained" color="error">
-                    Block
-                  </Button>
+                {currentUser?.uid === user.userId ? (
+                  <Chip label="Your Data" color="secondary"  />
                 ) : (
-                  <Button variant="contained" color="error">
-                    Active
-                  </Button>
+                  <>
+                    {user.status === "pending" ? (
+                      <>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          sx={{ marginRight: "10px" }}
+                          onClick={() =>
+                            onUserStatusChange(user.userId, "active")
+                          }
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          onClick={() =>
+                            onUserStatusChange(user.userId, "block")
+                          }
+                        >
+                          Reject
+                        </Button>
+                      </>
+                    ) : user.status === "active" ? (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => onUserStatusChange(user.userId, "block")}
+                      >
+                        Block
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="info"
+                        onClick={() =>
+                          onUserStatusChange(user.userId, "active")
+                        }
+                      >
+                        Activate
+                      </Button>
+                    )}
+                  </>
                 )}
               </TableCell>
             </TableRow>
