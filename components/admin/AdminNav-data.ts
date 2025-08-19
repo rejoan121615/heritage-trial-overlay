@@ -1,28 +1,41 @@
+import ViewListIcon from "@mui/icons-material/ViewList";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import GroupIcon from "@mui/icons-material/Group";
+import { OverridableComponent } from "@mui/material/OverridableComponent";
+import { SvgIconTypeMap } from "@mui/material";
 
-import ViewListIcon from '@mui/icons-material/ViewList';
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import GroupIcon from '@mui/icons-material/Group';
+type NavItemTYPE = {
+  
+  id: number;
+  title: string;
+  icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
+    muiName: string;
+  };
+  path: string;
+  type: 'heritage' | 'user';
 
-export const NavList = [
+}
+
+export const NavList: NavItemTYPE[] = [
   {
     id: 1,
     title: "New Heritage",
     icon: AddBoxIcon,
-    path: 'new',
-    type: 'heritage'
+    path: "new",
+    type: "heritage",
   },
   {
     id: 2,
     title: "All Heritage",
     icon: ViewListIcon,
-    path: '',
-    type: 'heritage'
+    path: "",
+    type: "heritage",
   },
   {
     id: 3,
     title: "Users",
     icon: GroupIcon,
-    path: 'users',
-    type: 'user'
-  }
+    path: "users",
+    type: "user",
+  },
 ];

@@ -4,15 +4,21 @@ import AdminNavigation from "@/components/admin/navbar/AdminNav";
 import { Box } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/firebase/firebaseConfig";
+import { auth, db } from "@/firebase/firebaseConfig";
 import LoadingPage from "@/components/feedback/LoadingPage";
+import { UserTYPE } from "@/types/AllTypes";
+import { doc, getDoc } from "firebase/firestore";
+import { UserContext } from "@/contexts/UserContext";
 
 const drawerWidth = "300px";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const [user, loading ] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const [canRender, setCanRender] = useState(false);
+  const [currentUserRecord, setCurrentUserRecord] = useState<UserTYPE | null>(
+    null
+  );
 
   useEffect(() => {
     if (!loading) {
@@ -22,6 +28,23 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         setCanRender(true);
       }
     }
+
+    // fetch user record
+
+    const fetchCurrentUser = async () => {
+      if (user) {
+        // Fetch user data from Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setCurrentUserRecord({
+            userId: userDoc.id,
+            ...userDoc.data(),
+          } as UserTYPE);
+        }
+      }
+    };
+
+    fetchCurrentUser();
   }, [loading, user, router]);
 
   // Block everything until we know if user is allowed
@@ -29,24 +52,26 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <Box sx={{ display: "flex" }}>
-        {/* admin navbar  */}
-        <AdminNavigation />
-        {/* contents  */}
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            minHeight: "100vh",
-            p: 3,
-            paddingTop: { xs: "80px", sm: "84px", md: "24px" },
-            width: { sm: `calc(100% - ${drawerWidth})` },
-            backgroundColor: "#f7f6f9",
-          }}
-        >
-          {children}
+      <UserContext.Provider value={currentUserRecord}>
+        <Box sx={{ display: "flex" }}>
+          {/* admin navbar  */}
+          <AdminNavigation />
+          {/* contents  */}
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              minHeight: "100vh",
+              p: 3,
+              paddingTop: { xs: "80px", sm: "84px", md: "24px" },
+              width: { sm: `calc(100% - ${drawerWidth})` },
+              backgroundColor: "#f7f6f9",
+            }}
+          >
+            {children}
+          </Box>
         </Box>
-      </Box>
+      </UserContext.Provider>
     </>
   );
 };

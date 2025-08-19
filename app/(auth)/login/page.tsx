@@ -71,6 +71,14 @@ const LoginPage = () => {
         return;
       }
 
+      if (retrivedUserData.status === "pending") {
+        setError("email", {
+          message: "Account waiting for approval.",
+        });
+        setSubmitProgress(false);
+        return;
+      }
+
       // do signin operation
       const res = await signInWithEmailAndPassword(auth, email, password);
 

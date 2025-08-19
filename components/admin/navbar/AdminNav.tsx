@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useContext, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -20,13 +20,15 @@ import UserProfile from "@/components/userProfile";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
+import { UserContext } from "@/contexts/UserContext";
 
 const drawerWidth = "300px";
 
 const AdminNav = () => {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [isClosing, setIsClosing] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const router = useRouter();
+  const currentUser = useContext(UserContext);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -46,24 +48,38 @@ const AdminNav = () => {
   const logoutHandler = async () => {
     try {
       await signOut(auth);
-      router.replace('/login');
+      router.replace("/login");
     } catch (error) {
       console.error("Error signing out:", error);
     }
-  }
+  };
 
   const drawer = (
-    <Box sx={{ display: 'flex', flexFlow: 'column wrap', justifyContent: "space-between", height: "100%" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexFlow: "column wrap",
+        justifyContent: "space-between",
+        height: "100%",
+      }}
+    >
       {/* navigation  */}
       <Box>
         <Toolbar></Toolbar>
         <Divider />
         <List>
           {NavList.map((Item) => {
+
+            if ( Item.type === "user" && !currentUser?.isAdmin) return null;
+
             return (
               <ListItem key={Item.id} disablePadding>
                 <Link
-                  href={ Item.type === 'heritage' ? `/heritage/${Item.path}` : `/${Item.path}`}
+                  href={
+                    Item.type === "heritage"
+                      ? `/heritage/${Item.path}`
+                      : `/${Item.path}`
+                  }
                   style={{ width: "100%", textDecoration: "none" }}
                 >
                   <ListItemButton>
