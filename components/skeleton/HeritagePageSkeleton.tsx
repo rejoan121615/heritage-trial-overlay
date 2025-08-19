@@ -3,10 +3,10 @@ import { Skeleton, Box, Grid } from "@mui/material";
 
 const HeritagePageSkeleton = () => {
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={3} sx={{ width: '100%'}}>
       {new Array(4).fill(null).map((_, index) => {
         return (
-          <Grid key={index} size={{ xl: 3 }}>
+          <Grid key={index} size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }}>
             <Box>
               <Skeleton variant="rectangular" width="100%" height={118} />
               <Skeleton variant="text" width="100%" height={30} sx={{ marginTop: '15px'}} />

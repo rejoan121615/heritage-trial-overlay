@@ -108,13 +108,14 @@ const AllHeritage = () => {
 
   return (
     <>
+        {/* <HeritagePageSkeleton /> */}
       {loading ? (
         <HeritagePageSkeleton />
       ) : (
         <Grid container spacing={3}>
           {heritageList?.map((heritage) => {
             return (
-              <Grid key={heritage.id} size={{ xl: 3 }}>
+              <Grid key={heritage.id} size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }}>
                 <HeritageCard
                   data={heritage}
                   showEditForm={showEditHeritageHandler}
