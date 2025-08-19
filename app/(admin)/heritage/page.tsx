@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import HeritageCard from "@/components/admin/heritage/HeritageCard";
-import { Grid } from "@mui/material";
+import { Box, Button, Grid, Paper } from "@mui/material";
 import { collection, query, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { FeedbackSnackbarTYPE, HeritageDataTYPE } from "@/types/AllTypes";
 import { db } from "@/firebase/firebaseConfig";
@@ -11,6 +11,9 @@ import DeleteConfirmationDialog from "@/components/feedback/DeleteConfirmationDi
 import FeedbackSnackbar from "@/components/feedback/FeedbackSnackbar";
 import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";
 import HeritagePageSkeleton from "@/components/skeleton/HeritagePageSkeleton";
+
+
+type HeritageViewState = "all" | "my";
 
 const AllHeritage = () => {
   const [heritageList, setHeritageList] = useState<HeritageDataTYPE[]>();
@@ -24,11 +27,7 @@ const AllHeritage = () => {
     alertType: "success",
   });
   const [showEdit, setShowEdit] = useState<boolean>(false);
-
-
-
-
-
+  const [heritageViewState, setheritageViewState] = useState<HeritageViewState | null>('my');
 
 
   useEffect(() => {
@@ -69,9 +68,9 @@ const AllHeritage = () => {
 
   const deleteHeritageHandler = () => {
     if (selectedHeritage && deleteConfirmationOpen) {
-      setDeleteConfirmationOpen(false); // hide the confirm box 
+      setDeleteConfirmationOpen(false); // hide the confirm box
 
-      // start database operation 
+      // start database operation
       const document = doc(db, "heritages", selectedHeritage);
 
       deleteDoc(document)
@@ -95,7 +94,6 @@ const AllHeritage = () => {
             alertType: "error",
           });
         });
-
     }
   };
 
@@ -108,14 +106,29 @@ const AllHeritage = () => {
 
   return (
     <>
-        {/* <HeritagePageSkeleton /> */}
+      <Paper
+        sx={{
+          width: "100%",
+          borderRadius: "4px",
+          marginBottom: "25px",
+          padding: "15px",
+        }}
+        elevation={1}
+      >
+        <Button variant="outlined" sx={{ marginRight: '15px'}}>My Heritages</Button>
+        <Button variant="outlined">All Heritages</Button>
+      </Paper>
+      {/* <HeritagePageSkeleton /> */}
       {loading ? (
         <HeritagePageSkeleton />
       ) : (
         <Grid container spacing={3}>
           {heritageList?.map((heritage) => {
             return (
-              <Grid key={heritage.id} size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }}>
+              <Grid
+                key={heritage.id}
+                size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }}
+              >
                 <HeritageCard
                   data={heritage}
                   showEditForm={showEditHeritageHandler}
@@ -127,7 +140,6 @@ const AllHeritage = () => {
         </Grid>
       )}
 
-      
       {/* delete confirmation dialog  */}
       <DeleteConfirmationDialog
         open={deleteConfirmationOpen}
@@ -138,7 +150,9 @@ const AllHeritage = () => {
       <HeritageEditModal
         open={showEdit}
         close={() => setShowEdit(false)}
-        heritageData={heritageList?.find(item => item.id === selectedHeritage)}
+        heritageData={heritageList?.find(
+          (item) => item.id === selectedHeritage
+        )}
         setHeritageList={setHeritageList}
       />
 
