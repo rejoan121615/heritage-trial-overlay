@@ -10,6 +10,7 @@ import LoadingPage from "@/components/feedback/LoadingPage";
 import DeleteConfirmationDialog from "@/components/feedback/DeleteConfirmationDialog";
 import FeedbackSnackbar from "@/components/feedback/FeedbackSnackbar";
 import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";
+import HeritagePageSkeleton from "@/components/skeleton/HeritagePageSkeleton";
 
 const AllHeritage = () => {
   const [heritageList, setHeritageList] = useState<HeritageDataTYPE[]>();
@@ -108,7 +109,7 @@ const AllHeritage = () => {
   return (
     <>
       {loading ? (
-        <LoadingPage />
+        <HeritagePageSkeleton />
       ) : (
         <Grid container spacing={3}>
           {heritageList?.map((heritage) => {
@@ -124,6 +125,8 @@ const AllHeritage = () => {
           })}
         </Grid>
       )}
+
+      
       {/* delete confirmation dialog  */}
       <DeleteConfirmationDialog
         open={deleteConfirmationOpen}

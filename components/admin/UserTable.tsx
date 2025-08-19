@@ -25,9 +25,6 @@ const UserListPage = ({
 }) => {
   const [currentUser] = useAuthState(auth);
 
-  useEffect(() => {
-    console.log("current user ", currentUser);
-  }, [currentUser]);
 
   return (
     <TableContainer component={Paper} sx={{ borderRadius: "10px" }}>

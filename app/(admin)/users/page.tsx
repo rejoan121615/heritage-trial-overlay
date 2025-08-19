@@ -15,7 +15,7 @@ import UserTable from "@/components/admin/UserTable";
 import { collection, doc, getDocs, query, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { UserTYPE } from "@/types/AllTypes";
-import UserSkeleton from "@/components/feedback/UserSkeleton";
+import UserSkeleton from "@/components/skeleton/UserSkeleton";
 
 const UserListPage = () => {
   const [userList, setUserList] = useState<UserTYPE[] | null>(null);

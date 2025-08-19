@@ -18,11 +18,11 @@ const HeritageCard = ( { data, showEditForm, delete: deleteHeritage } : { data :
         image={data.image}
         sx={{ height: '200px'}}
       />
-      <CardContent>
+      <CardContent sx={{ height: '120px'}}>
         <Typography gutterBottom variant="h5" component="div">
           { data.title }
         </Typography>
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+        <Typography variant="body2" sx={{ color: "text.secondary", maxHeight: '60px', overflow: 'hidden' }}>
           {data.summary}
         </Typography>
       </CardContent>
