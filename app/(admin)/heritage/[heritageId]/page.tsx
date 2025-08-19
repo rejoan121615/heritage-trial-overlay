@@ -8,6 +8,9 @@ import {
   ListItem,
   ListItemText,
   Button,
+  Stack,
+  Typography,
+  Grid,
 } from "@mui/material";
 import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
@@ -15,13 +18,16 @@ import { db } from "@/firebase/firebaseConfig";
 import { HeritageDataTYPE } from "@/types/AllTypes";
 import QRCode from "qrcode";
 import { QrCode } from "@mui/icons-material";
+import HeritageDetailsRow from "@/components/admin/heritage/HeritageDetailsRow";
+import LoadingPage from "@/components/feedback/LoadingPage";
+import HeritageDetailsSkeleton from "@/components/skeleton/HeritageDetailsSkeleton";
 
 const HeritageDetailsPage = ({
   params,
 }: {
   params: Promise<{ heritageId: string }>;
 }) => {
-  const [heritage, setHeritage] = useState<HeritageDataTYPE>();
+  const [heritage, setHeritage] = useState<HeritageDataTYPE | null>(null);
   const { heritageId } = use(params);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -34,14 +40,14 @@ const HeritageDetailsPage = ({
         qrCanvasRef.current,
         qrUrl,
         {
-          width: 400,
+          width: 250,
         },
         function (error) {
           if (error) console.log("creating qr code failed ", error);
         }
       );
     }
-  }, [heritageId]);
+  }, [heritageId, qrCanvasRef.current, heritage]);
 
   // fetch heritage data
   useEffect(() => {
@@ -58,11 +64,11 @@ const HeritageDetailsPage = ({
         }
       } catch (error) {
         console.error("Error fetching heritage data:", error);
-        setHeritage(undefined);
+        setHeritage(null);
       }
     };
 
-    if (heritageId) { 
+    if (heritageId) {
       fetchDocument();
     }
   }, [heritageId]);
@@ -79,51 +85,88 @@ const HeritageDetailsPage = ({
   return (
     <Card sx={{ width: "100%", height: "100%" }}>
       <Box
-        sx={{ width: "100%", maxWidth: "400px", margin: "25px auto 10px auto" }}
+        sx={{
+          padding: {
+            xs: "30px",
+            md: "50px 30px",
+            lg: "80px 25px",
+            xl: "120px 0px",
+          },
+        }}
       >
-        <List>
-          <ListItem sx={{ flexFlow: "column wrap" }}>
-            <ListItemText>Qr Code</ListItemText>
-            <Box component={"div"}>
-              <canvas ref={qrCanvasRef}></canvas>
-            </Box>
-            <Button
-              onClick={qrCodeDownloadHandler}
-              startIcon={<QrCode />}
-              sx={{ borderRadius: "4px" }}
-              color="success"
-              variant="outlined"
+        {heritage === null ? (
+          <HeritageDetailsSkeleton />
+        ) : (
+          <>
+            <Grid
+              container
+              sx={{
+                rowGap: { sm: "20px" },
+                width: "100%",
+                maxWidth: "650px",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
             >
-              Download Qr Code
-            </Button>
-          </ListItem>
-          <ListItem>
-            <ListItemText>Title: {heritage?.title}</ListItemText>
-          </ListItem>
-          {heritage?.image && (
-            <ListItem sx={{ flexFlow: "column wrap" }}>
-              <ListItemText>Images: </ListItemText>
-              <Image
-                width={400}
-                height={200}
-                src={heritage?.image}
-                alt={heritage?.title}
-              />
-            </ListItem>
-          )}
+              {/* title  */}
+              <HeritageDetailsRow title="Title">
+                <Typography>{heritage?.title}</Typography>
+              </HeritageDetailsRow>
 
-          {heritage?.summary && (
-            <ListItem>
-              <ListItemText>Summary: {heritage?.summary} </ListItemText>
-            </ListItem>
-          )}
-          <ListItem>
-            <ListItemText>Category: {heritage?.category}</ListItemText>
-          </ListItem>
-          <ListItem>
-            <ListItemText>Location: {heritage?.location}</ListItemText>
-          </ListItem>
-        </List>
+              {/* Image  */}
+              <HeritageDetailsRow title="Image">
+                <Image
+                  width={300}
+                  height={150}
+                  src={heritage?.image}
+                  alt={heritage?.title}
+                  style={{
+                    width: "100%",
+                    height: "initial",
+                    aspectRatio: "2 / 1",
+                  }}
+                />
+              </HeritageDetailsRow>
+
+              {/* summary  */}
+              <HeritageDetailsRow title="Summary">
+                <Typography>{heritage.summary}</Typography>
+              </HeritageDetailsRow>
+
+              {/* Location  */}
+              <HeritageDetailsRow title="Location">
+                <Typography>{heritage.location}</Typography>
+              </HeritageDetailsRow>
+
+              {/* Location  */}
+              <HeritageDetailsRow title="Category">
+                <Typography sx={{ textTransform: "capitalize" }}>
+                  {heritage.category}
+                </Typography>
+              </HeritageDetailsRow>
+
+              {/* qr code  */}
+              <HeritageDetailsRow title="QR-Code">
+                <Box component={"div"}>
+                  <canvas ref={qrCanvasRef}></canvas>
+                </Box>
+              </HeritageDetailsRow>
+
+              {/* qr code download button  */}
+              <HeritageDetailsRow title="">
+                <Button
+                  onClick={qrCodeDownloadHandler}
+                  startIcon={<QrCode />}
+                  sx={{ borderRadius: "4px" }}
+                  color="success"
+                  variant="outlined"
+                >
+                  Download Qr Code
+                </Button>
+              </HeritageDetailsRow>
+            </Grid>
+          </>
+        )}
       </Box>
     </Card>
   );
