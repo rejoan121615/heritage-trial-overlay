@@ -63,7 +63,7 @@ const AdminNav = () => {
             return (
               <ListItem key={Item.id} disablePadding>
                 <Link
-                  href={`/heritage/${Item.path}`}
+                  href={ Item.type === 'heritage' ? `/heritage/${Item.path}` : `/${Item.path}`}
                   style={{ width: "100%", textDecoration: "none" }}
                 >
                   <ListItemButton>

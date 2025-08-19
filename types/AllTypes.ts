@@ -23,3 +23,13 @@ export type FeedbackSnackbarTYPE = {
   title: string;
   alertType: "success" | "error" | "warning" | "info" ;
 };
+
+export type UserTYPE = {
+  userId: string;
+  name: string;
+  email: string;
+  totalHeritage: number;
+  status: "pending" | "block" | "active";
+  isAdmin: boolean;
+  createdAt: Timestamp;
+}

@@ -10,10 +10,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { FirebaseError } from "firebase/app";
 import { redirect, useRouter } from 'next/navigation'
+import { UserTYPE } from "@/types/AllTypes";
 
 
 const RegisterSchema = z
@@ -57,13 +58,17 @@ const RegisterPage = () => {
 
       // store user in database
       await setDoc(doc(db, "users", res.user.uid), {
+        userId: res.user.uid,
         name,
         email,
-        createdAt: new Date(),
-      });
+        totalHeritage: 0,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+        isAdmin: false,
+      } as UserTYPE);
 
       // redirect 
-      router.replace('/admin')
+      router.replace('/heritage')
     } catch (error) {
       if (error instanceof FirebaseError ) {
         if (error.code === "auth/email-already-in-use") {
