@@ -11,12 +11,16 @@ import DeleteConfirmationDialog from "@/components/feedback/DeleteConfirmationDi
 import FeedbackSnackbar from "@/components/feedback/FeedbackSnackbar";
 import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";
 import HeritagePageSkeleton from "@/components/skeleton/HeritagePageSkeleton";
-
+import { UserContext } from "@/contexts/UserContext";
+import NoHeritageFound from "@/components/noHeritageFound";
 
 type HeritageViewState = "all" | "my";
 
 const AllHeritage = () => {
-  const [heritageList, setHeritageList] = useState<HeritageDataTYPE[]>();
+  const [heritageDocumentSnapshort, setHeritageDocumentSnapshort] = useState<
+    HeritageDataTYPE[] | null
+  >(null);
+  const [heritageList, setHeritageList] = useState<HeritageDataTYPE[] | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
     useState<boolean>(false);
@@ -27,11 +31,12 @@ const AllHeritage = () => {
     alertType: "success",
   });
   const [showEdit, setShowEdit] = useState<boolean>(false);
-  const [heritageViewState, setheritageViewState] = useState<HeritageViewState | null>('my');
-
+  const [heritageViewState, setHeritageViewState] =
+    useState<HeritageViewState>("my");
+  const currentUser = React.useContext(UserContext);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchHeritageDocs = async () => {
       try {
         const q = query(collection(db, "heritages"));
         const querySnapshot = await getDocs(q);
@@ -44,7 +49,7 @@ const AllHeritage = () => {
             } as HeritageDataTYPE;
           });
 
-          setHeritageList(documentList);
+          setHeritageDocumentSnapshort(documentList);
         }
 
         setLoading(false);
@@ -53,8 +58,22 @@ const AllHeritage = () => {
       }
     };
 
-    fetchPosts();
+    fetchHeritageDocs();
   }, []);
+
+  // heritage list state updater
+  useEffect(() => {
+    if (currentUser && heritageDocumentSnapshort) {
+      if (heritageViewState === "my") {
+        const myHeritageList = heritageDocumentSnapshort?.filter(
+          (item) => item.userId === currentUser?.userId
+        );
+        setHeritageList(myHeritageList);
+      } else {
+        setHeritageList(heritageDocumentSnapshort);
+      }
+    }
+  }, [heritageViewState, currentUser, heritageDocumentSnapshort]);
 
   const showEditHeritageHandler = (id: string) => {
     setShowEdit(true);
@@ -106,21 +125,30 @@ const AllHeritage = () => {
 
   return (
     <>
-      <Paper
-        sx={{
-          width: "100%",
-          borderRadius: "4px",
-          marginBottom: "25px",
-          padding: "15px",
-        }}
-        elevation={1}
-      >
-        <Button variant="outlined" sx={{ marginRight: '15px'}}>My Heritages</Button>
-        <Button variant="outlined">All Heritages</Button>
-      </Paper>
+      {currentUser?.isAdmin && (
+        <Paper
+          sx={{
+            width: "100%",
+            borderRadius: "4px",
+            marginBottom: "25px",
+            padding: "15px",
+          }}
+          elevation={1}
+        >
+          <Button variant={heritageViewState === 'my' ? "contained" : "outlined"} sx={{ marginRight: "15px" }} onClick={() => setHeritageViewState("my")}>
+            My Heritages
+          </Button>
+          <Button variant={ heritageViewState === 'all' ? "contained" : "outlined"} onClick={() => setHeritageViewState("all")}>
+            All Heritages
+          </Button>
+        </Paper>
+      )}
+
       {/* <HeritagePageSkeleton /> */}
       {loading ? (
         <HeritagePageSkeleton />
+      ) : heritageList?.length === 0 ? (
+        <NoHeritageFound />
       ) : (
         <Grid container spacing={3}>
           {heritageList?.map((heritage) => {
