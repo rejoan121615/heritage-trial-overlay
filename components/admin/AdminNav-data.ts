@@ -5,16 +5,14 @@ import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { SvgIconTypeMap } from "@mui/material";
 
 type NavItemTYPE = {
-  
   id: number;
   title: string;
-  icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
+  icon: OverridableComponent<SvgIconTypeMap<Record<string, unknown>, "svg">> & {
     muiName: string;
   };
   path: string;
-  type: 'heritage' | 'user';
-
-}
+  type: "heritage" | "user";
+};
 
 export const NavList: NavItemTYPE[] = [
   {

@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import HeritageCard from "@/components/admin/heritage/HeritageCard";
-import { Box, Button, Grid, Paper } from "@mui/material";
+import { Button, Grid, Paper } from "@mui/material";
 import { collection, query, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { FeedbackSnackbarTYPE, HeritageDataTYPE } from "@/types/AllTypes";
 import { db } from "@/firebase/firebaseConfig";
-import LoadingPage from "@/components/feedback/LoadingPage";
 import DeleteConfirmationDialog from "@/components/feedback/DeleteConfirmationDialog";
 import FeedbackSnackbar from "@/components/feedback/FeedbackSnackbar";
 import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";

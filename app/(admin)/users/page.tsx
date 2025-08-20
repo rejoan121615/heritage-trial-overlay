@@ -2,13 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Paper,
-  TableContainer,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Typography,
 } from "@mui/material";
 import UserTable from "@/components/admin/UserTable";

@@ -4,11 +4,7 @@ import React, { use, useEffect, useRef, useState } from "react";
 import {
   Card,
   Box,
-  List,
-  ListItem,
-  ListItemText,
   Button,
-  Stack,
   Typography,
   Grid,
 } from "@mui/material";
@@ -19,7 +15,6 @@ import { HeritageDataTYPE } from "@/types/AllTypes";
 import QRCode from "qrcode";
 import { QrCode } from "@mui/icons-material";
 import HeritageDetailsRow from "@/components/admin/heritage/HeritageDetailsRow";
-import LoadingPage from "@/components/feedback/LoadingPage";
 import HeritageDetailsSkeleton from "@/components/skeleton/HeritageDetailsSkeleton";
 
 const HeritageDetailsPage = ({
@@ -47,7 +42,7 @@ const HeritageDetailsPage = ({
         }
       );
     }
-  }, [heritageId, qrCanvasRef.current, heritage]);
+  }, [heritageId, heritage]);
 
   // fetch heritage data
   useEffect(() => {
