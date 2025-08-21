@@ -3,7 +3,6 @@ import {
   Grid,
   Avatar,
   Divider,
-  Typography,
   Button,
   TextField,
   Box,
@@ -16,6 +15,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
 import UploadIcon from "@mui/icons-material/Upload";
 import { UserContext } from "@/contexts/UserContext";
+import { updateEmail, updatePassword } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
+import { useSnackbar } from "@/components/feedback/SnackbarContext";
+
+
 
 const ProfileEditSchema = z
   .object({
@@ -45,7 +49,9 @@ const ProfileEditSchema = z
     confirmPassword: z
       .union([
         z.literal(""), // allow empty string
-        z.string().min(8, "Confirm Password must be at least 8 characters long"),
+        z
+          .string()
+          .min(8, "Confirm Password must be at least 8 characters long"),
       ])
       .optional(),
   })
@@ -90,6 +96,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
 
   const [preview, setPreview] = useState<File | null>(null);
   const currentUser = useContext(UserContext);
+  const { showMessage } = useSnackbar()
 
   //   form value setter
   useEffect(() => {
@@ -99,12 +106,8 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
     });
   }, []);
 
-  const submitHandler = (data: ProfileEditTYPE) => {
+  const submitHandler = async (data: ProfileEditTYPE) => {
     console.log(data);
-
-    // update email
-
-    // update password
   };
 
   return (

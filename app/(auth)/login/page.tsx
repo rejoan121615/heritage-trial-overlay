@@ -14,6 +14,7 @@ import { auth, db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { UserTYPE } from "@/types/AllTypes";
+import { useSnackbar } from "@/components/feedback/SnackbarContext";
 
 const LoginSchema = z.object({
   email: z.email("Invalid email address."),
@@ -39,8 +40,8 @@ const LoginPage = () => {
   });
 
   const router = useRouter();
-
   const [submitProgress, setSubmitProgress] = useState<boolean>(false);
+  const { showMessage } = useSnackbar();
 
   // handle submit
   const onSubmit = async (data: LoginFormTYPE) => {
@@ -57,6 +58,8 @@ const LoginPage = () => {
         setError("email", {
           message: "Invalid email, check the email address.",
         });
+        setSubmitProgress(false);
+        showMessage('Invalid email, Account verification failed', 'error');
         return;
       }
 

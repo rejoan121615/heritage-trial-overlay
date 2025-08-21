@@ -77,7 +77,7 @@ const ProfilePage = ({
         { currentUser == null ? (
           <ProfileSkeleton />
         ) : currentWindow === 'profile' ? (
-          <ProfileDetails user={currentUser} allowEdit={ () => setcurrentWindow('profileEdit')} />
+          <ProfileDetails userData={currentUser} allowEdit={ () => setcurrentWindow('profileEdit')} />
         ) : (
           <ProfileEdit closeEdit={() => setcurrentWindow('profile')} />
         )}

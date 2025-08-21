@@ -1,14 +1,77 @@
-import React from "react";
-import { Grid, Avatar, Divider, Typography, Button } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Grid,
+  Avatar,
+  Divider,
+  Typography,
+  Button,
+  Stack,
+  Chip,
+} from "@mui/material";
 import HeritageDetailsRow from "../heritage/HeritageDetailsRow";
 import { UserContext } from "@/contexts/UserContext";
 import { createContext } from "vm";
 import { UserTYPE } from "@/types/AllTypes";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/firebaseConfig";
+import { sendEmailVerification } from "firebase/auth";
+import { useSnackbar } from "@/components/feedback/SnackbarContext";
 
-const ProfileDetails = ({ user, allowEdit } : { user: UserTYPE, allowEdit: () => void }) => {
+const ProfileDetails = ({
+  userData,
+  allowEdit,
+}: {
+  userData: UserTYPE;
+  allowEdit: () => void;
+}) => {
+  const [user, loading, error] = useAuthState(auth);
+  const { showMessage } = useSnackbar();
+  const [startVerification, setStartVerification] = useState<boolean>(false);
 
+  const actionCodeSettings = {
+    url: window.location.href,
+    handleCodeInApp: true,
+  };
 
+  const emailVerificationHandler = async () => {
+    if (user && !user.emailVerified) {
+      try {
+        await sendEmailVerification(user, actionCodeSettings);
+        showMessage(
+          "Verification email sent, Please check your email",
+          "success"
+        );
+        setStartVerification(true);
+      } catch (error) {
+        console.log("email verification error", error);
+        showMessage("Error sending email verification", "error");
+      }
+    }
+  };
 
+  // user verfication status monitor
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (startVerification && user) {
+      timer = setInterval(() => {
+
+        user.reload().then(() => {
+          if (user?.emailVerified) {
+            clearInterval(timer);
+            setStartVerification(false);
+            showMessage("Email verified successfully", "success");
+          }
+        })
+        
+      }, 5000);
+    }
+
+    return () => {
+      clearInterval(timer);
+    }
+    
+  }, [startVerification]);
 
   return (
     <Grid
@@ -32,22 +95,50 @@ const ProfileDetails = ({ user, allowEdit } : { user: UserTYPE, allowEdit: () =>
 
       {/* title  */}
       <HeritageDetailsRow title="User Name">
-        <Typography>{user.name}</Typography>
+        <Typography>{userData.name}</Typography>
       </HeritageDetailsRow>
 
       {/* Image  */}
       <HeritageDetailsRow title="Email">
-        <Typography>{user.email}</Typography>
+        <Stack flexDirection={"row"} alignItems={"start"} gap={2}>
+          <Typography>{userData.email}</Typography>
+          {user?.emailVerified ? (
+            <Chip label={"Verifyed"} color="success" />
+          ) : (
+            <>
+              <Chip
+                label={"not verifyed"}
+                color="error"
+                sx={{ textTransform: "capitalize" }}
+              />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={emailVerificationHandler}
+                disabled={startVerification}
+              >
+                Verify Email
+              </Button>
+            </>
+          )}
+        </Stack>
       </HeritageDetailsRow>
 
       {/* summary  */}
+      {startVerification && (
+        <HeritageDetailsRow title="">
+          <Typography>Email send, Check inbox / spam folder</Typography>
+        </HeritageDetailsRow>
+      )}
+
+      {/* summary  */}
       <HeritageDetailsRow title="Profile Type">
-        <Typography>{user.isAdmin ? "Admin" : "User"}</Typography>
+        <Typography>{userData.isAdmin ? "Admin" : "User"}</Typography>
       </HeritageDetailsRow>
 
       {/* Location  */}
       <HeritageDetailsRow title="Total Heritage">
-        <Typography>{user.totalHeritage}</Typography>
+        <Typography>{userData.totalHeritage}</Typography>
       </HeritageDetailsRow>
 
       <Grid size={12} sx={{ marginBottom: { xs: "15px", sm: "0px" } }}>

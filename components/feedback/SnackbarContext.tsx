@@ -30,7 +30,7 @@ export const SnackbarProvider = ({ children }: { children: ReactNode }) => {
   return (
     <SnackbarContext.Provider value={{ showMessage }}>
       {children}
-      <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+      <Snackbar open={open} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ horizontal: "right", vertical: 'bottom'}} >
         <Alert onClose={handleClose} severity={severity} variant="filled" sx={{ width: "100%" }}>
           {message}
         </Alert>
