@@ -15,11 +15,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
 import UploadIcon from "@mui/icons-material/Upload";
 import { UserContext } from "@/contexts/UserContext";
-import { updateEmail, updatePassword } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
+import {
+  updateEmail,
+  updatePassword,
+  updateProfile,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+} from "firebase/auth";
+import { auth, db } from "@/firebase/firebaseConfig";
 import { useSnackbar } from "@/components/feedback/SnackbarContext";
-
-
+import { useAuthState } from "react-firebase-hooks/auth";
+import { doc, updateDoc } from "firebase/firestore";
 
 const ProfileEditSchema = z
   .object({
@@ -36,19 +42,19 @@ const ProfileEditSchema = z
     email: z.email(),
     oldPassword: z
       .union([
-        z.literal(""), // allow empty string
+        z.literal(""),
         z.string().min(8, "Old Password must be at least 8 characters long"),
       ])
       .optional(),
     password: z
       .union([
-        z.literal(""), // allow empty string
+        z.literal(""),
         z.string().min(8, "New Password must be at least 8 characters long"),
       ])
       .optional(),
     confirmPassword: z
       .union([
-        z.literal(""), // allow empty string
+        z.literal(""),
         z
           .string()
           .min(8, "Confirm Password must be at least 8 characters long"),
@@ -96,7 +102,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
 
   const [preview, setPreview] = useState<File | null>(null);
   const currentUser = useContext(UserContext);
-  const { showMessage } = useSnackbar()
+  const { showMessage } = useSnackbar();
 
   //   form value setter
   useEffect(() => {
@@ -107,7 +113,65 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
   }, []);
 
   const submitHandler = async (data: ProfileEditTYPE) => {
-    console.log(data);
+    const { image, name, email, oldPassword, password } = data;
+
+    if (!auth.currentUser) return;
+    const user = auth.currentUser;
+
+    closeEdit();
+
+    try {
+      // handle dublicate email
+      try {
+        await updateEmail(user, email);
+      } catch (error: any) {
+        if (error.code === "auth/email-already-in-use") {
+          showMessage(
+            "Email update failed as it is already attached to another account",
+            "error"
+          );
+        } else {
+          showMessage("Email update failed", "error");
+        }
+        return;
+      }
+
+      // update profile name
+      if (name && name !== user.displayName) {
+        await updateProfile(user, { displayName: name });
+      }
+
+      // update password (reauth required)
+      if (oldPassword && password) {
+        const credential = EmailAuthProvider.credential(
+          user.email!, // must be current email from Firebase
+          oldPassword
+        );
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, password);
+      }
+
+      // -------- Update Firestore users record -------- //
+      const userRef = doc(db, "users", user.uid);
+      const updatePayload: any = {};
+
+      if (name) updatePayload.name = name;
+      if (email) updatePayload.email = email;
+      if (image) {
+        // upload image first → Cloudinary/Storage → get url
+        // example: const imageUrl = await uploadToCloudinary(image)
+        // updatePayload.image = imageUrl
+      }
+
+      if (Object.keys(updatePayload).length > 0) {
+        await updateDoc(userRef, updatePayload);
+      }
+
+      showMessage("✅ Profile updated successfully", "success");
+    } catch (error: any) {
+      console.error(error);
+      showMessage(error.message || "Profile update failed", "error");
+    }
   };
 
   return (

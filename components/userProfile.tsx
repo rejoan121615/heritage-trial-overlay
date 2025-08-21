@@ -1,7 +1,11 @@
 import React from "react";
 import { Box, Divider, Avatar, Typography, Button } from "@mui/material";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/firebaseConfig";
 
 const UserProfile = ({logout} : {logout: () => void}) => {
+  const [user, loading, error] = useAuthState(auth);
+
   return (
     <Box>
       <Divider />
@@ -15,7 +19,7 @@ const UserProfile = ({logout} : {logout: () => void}) => {
         }}
       >
         <Avatar alt="Remy Sharp" />
-        <Typography>Mohd Rejoan</Typography>
+        <Typography sx={{ textTransform: 'capitalize' }}>{ user?.displayName }</Typography>
         <Button variant="contained" color="error" onClick={logout} sx={{ borderRadius: '5px'}}>
           Logout
         </Button>
