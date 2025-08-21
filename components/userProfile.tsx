@@ -14,7 +14,7 @@ const UserProfile = ({logout} : {logout: () => void}) => {
           textAlign: "center",
         }}
       >
-        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+        <Avatar alt="Remy Sharp" />
         <Typography>Mohd Rejoan</Typography>
         <Button variant="contained" color="error" onClick={logout} sx={{ borderRadius: '5px'}}>
           Logout

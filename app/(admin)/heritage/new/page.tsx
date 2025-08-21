@@ -25,6 +25,7 @@ import { db, auth } from "@/firebase/firebaseConfig";
 import { useRouter } from 'next/navigation';
 import { categoryOptions, HeritageSchema } from "@/utils/HeritageAssist";
 import { uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
+import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
 
 
 
@@ -33,17 +34,7 @@ import { uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
 
 type HeritageFormDataTYPE = z.infer<typeof HeritageSchema>;
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+
 
 
 const NewHeritagePage = () => {

@@ -69,19 +69,17 @@ const AdminNav = () => {
         <Divider />
         <List>
           {NavList.map((Item) => {
-
-            if ( Item.type === "user" && !currentUser?.isAdmin) return null;
+            if (Item.type === "admin" && !currentUser?.isAdmin) return null;
 
             return (
               <ListItem key={Item.id} disablePadding>
                 <Link
-                  href={
-                    Item.type === "heritage"
-                      ? `/heritage/${Item.path}`
-                      : `/${Item.path}`
-                  }
+                  href={`/${Item.path}`}
                   style={{ width: "100%", textDecoration: "none" }}
                 >
+                  {Item.title === "Profile" ? (
+                    <Divider component={"div"} sx={{ width: "100%" }} />
+                  ) : null}
                   <ListItemButton>
                     <ListItemIcon>
                       <Item.icon />
