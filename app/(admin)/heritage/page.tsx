@@ -12,6 +12,7 @@ import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";
 import HeritagePageSkeleton from "@/components/skeleton/HeritagePageSkeleton";
 import { UserContext } from "@/contexts/UserContext";
 import NoHeritageFound from "@/components/noHeritageFound";
+import { deleteFromCloudinary } from "@/utils/cloudinaryAssistFunction";
 
 type HeritageViewState = "all" | "my";
 
@@ -19,7 +20,9 @@ const AllHeritage = () => {
   const [heritageDocumentSnapshort, setHeritageDocumentSnapshort] = useState<
     HeritageDataTYPE[] | null
   >(null);
-  const [heritageList, setHeritageList] = useState<HeritageDataTYPE[] | undefined>(undefined);
+  const [heritageList, setHeritageList] = useState<
+    HeritageDataTYPE[] | undefined
+  >(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
     useState<boolean>(false);
@@ -84,16 +87,32 @@ const AllHeritage = () => {
     setSelectedHeritage(id);
   };
 
-  const deleteHeritageHandler = () => {
+  const deleteHeritageHandler = async () => {
     if (selectedHeritage && deleteConfirmationOpen) {
       setDeleteConfirmationOpen(false); // hide the confirm box
 
       // start database operation
       const document = doc(db, "heritages", selectedHeritage);
 
-      deleteDoc(document)
-        .then(() => {
+      // test image delete function
+      let selectedHeritageData = heritageList?.find(
+        (item) => item.id === selectedHeritage
+      );
+
+      // delete image from cloudinary
+      if (!selectedHeritageData?.imgPublicId) return;
+
+      try {
+        const imgDeleteRes = await deleteFromCloudinary(
+          selectedHeritageData?.imgPublicId
+        );
+
+        if (imgDeleteRes.success) {
+          // delete record from firebase
+          await deleteDoc(document);
+
           setSelectedHeritage(null);
+          // delete from local state
           setHeritageList((prevState) => {
             return prevState?.filter((item) => item.id !== selectedHeritage);
           });
@@ -103,15 +122,21 @@ const AllHeritage = () => {
             title: "Heritage deleted successfully",
             alertType: "success",
           });
-        })
-        .catch((error) => {
-          console.error("Error removing document: ", error);
+        } else {
           setDeleteFeedback({
             open: true,
-            title: "Error deleting heritage",
+            title: imgDeleteRes.error || "Failed to delete heritage image",
             alertType: "error",
           });
+        }
+      } catch (error) {
+        console.error("Error removing document: ", error);
+        setDeleteFeedback({
+          open: true,
+          title: "Error deleting heritage",
+          alertType: "error",
         });
+      }
     }
   };
 
@@ -134,10 +159,17 @@ const AllHeritage = () => {
           }}
           elevation={1}
         >
-          <Button variant={heritageViewState === 'my' ? "contained" : "outlined"} sx={{ marginRight: "15px" }} onClick={() => setHeritageViewState("my")}>
+          <Button
+            variant={heritageViewState === "my" ? "contained" : "outlined"}
+            sx={{ marginRight: "15px" }}
+            onClick={() => setHeritageViewState("my")}
+          >
             My Heritages
           </Button>
-          <Button variant={ heritageViewState === 'all' ? "contained" : "outlined"} onClick={() => setHeritageViewState("all")}>
+          <Button
+            variant={heritageViewState === "all" ? "contained" : "outlined"}
+            onClick={() => setHeritageViewState("all")}
+          >
             All Heritages
           </Button>
         </Paper>

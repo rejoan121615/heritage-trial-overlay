@@ -8,6 +8,7 @@ export type HeritageDataTYPE = {
     location: string;
     category: string;
     image: string;
+    imgPublicId: string;
     userId: string;
     createdAt: Timestamp;
 }
@@ -35,13 +36,11 @@ export type UserTYPE = {
 export type CloudinaryUploadResponseTYPE = {
   success: boolean;
   imageUrl: string | null;
+  publicId: string | null;
   error?: string;
 };
 
-export type CloudinaryUploadResponse = {
-  success: true
-  imageUrl: string
-} | {
-  success: false
-  error: string
+export type CloudinaryDeleteResponseTYPE = {
+  success: boolean
+  error?: string
 }

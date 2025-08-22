@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
       const res: CloudinaryUploadResponseTYPE = {
         success: false,
         imageUrl: null,
+        publicId: null,
         error: "No file provided",
       };
       return NextResponse.json(res, { status: 400 });
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
     const res: CloudinaryUploadResponseTYPE = {
       success: true,
       imageUrl: result.secure_url,
+      publicId: result.public_id,
     };
 
     return NextResponse.json(res);
@@ -60,6 +62,7 @@ export async function POST(req: NextRequest) {
     const res: CloudinaryUploadResponseTYPE = {
       success: false,
       imageUrl: null,
+      publicId: null,
       error: err.message,
     };
     return NextResponse.json(res, { status: 500 });

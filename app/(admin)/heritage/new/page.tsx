@@ -53,13 +53,18 @@ const NewHeritagePage = () => {
     const currentUser = auth.currentUser;
 
     try {
+
       let imageUrl: CloudinaryUploadResponseTYPE = {
         success: false,
         imageUrl: null,
         error: undefined,
+        publicId: null,
       };
+
       if (image) {
         imageUrl = await uploadToCloudinary(image, 'heritages');
+
+        console.log('uploaded image details ', imageUrl);
       }
 
       // upload heritage record into db
@@ -69,6 +74,7 @@ const NewHeritagePage = () => {
         location,
         category,
         image:  imageUrl.success ? imageUrl.imageUrl : null,
+        imgPublicId:  imageUrl.success ? imageUrl.publicId : null,
         createdAt: serverTimestamp(),
         userId: currentUser?.uid,
       });
