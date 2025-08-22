@@ -12,11 +12,9 @@ export type HeritageDataTYPE = {
     createdAt: Timestamp;
 }
 
-
 export type CameraContextTYPE = {
   heritageData: HeritageDataTYPE | null;
 };
-
 
 export type FeedbackSnackbarTYPE = {
   open: boolean;
@@ -32,4 +30,18 @@ export type UserTYPE = {
   status: "pending" | "block" | "active";
   isAdmin: boolean;
   createdAt: Timestamp;
+}
+
+export type CloudinaryUploadResponseTYPE = {
+  success: boolean;
+  imageUrl: string | null;
+  error?: string;
+};
+
+export type CloudinaryUploadResponse = {
+  success: true
+  imageUrl: string
+} | {
+  success: false
+  error: string
 }

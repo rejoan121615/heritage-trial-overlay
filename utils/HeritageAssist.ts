@@ -23,8 +23,8 @@ export const HeritageSchema = z.object({
   }),
   image: z
     .instanceof(File, { message: "Please upload a file" })
-    .refine((file) => file.size <= 3 * 1024 * 1024, {
-      message: "File size must be less than 3MB",
+    .refine((file) => file.size <= 10 * 1024 * 1024, {
+      message: "File size must be less than 10MB",
     })
     .refine((file) => file.type.startsWith("image/"), {
       message: "Only image files are allowed",
