@@ -63,8 +63,6 @@ const NewHeritagePage = () => {
 
       if (image) {
         imageUrl = await uploadToCloudinary(image, 'heritages');
-
-        console.log('uploaded image details ', imageUrl);
       }
 
       // upload heritage record into db

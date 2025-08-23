@@ -7,7 +7,7 @@ import {
 
 export const uploadToCloudinary = async (
   file: File,
-  folder: "heritages" | "users"
+  folder: "heritages" | "users",
 ): Promise<CloudinaryUploadResponseTYPE> => {
   const formData = new FormData();
   formData.append("file", file);
@@ -49,7 +49,6 @@ export const uploadToCloudinary = async (
 };
 
 // delete image request handler
-
 export const deleteFromCloudinary = async (
   public_id: string
 ): Promise<CloudinaryDeleteResponseTYPE> => {

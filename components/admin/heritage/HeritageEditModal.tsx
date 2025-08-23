@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { HeritageDataTYPE } from "@/types/AllTypes";
+import {
+  CloudinaryUploadResponseTYPE,
+  HeritageDataTYPE,
+} from "@/types/AllTypes";
 import {
   Dialog,
   DialogTitle,
@@ -25,9 +28,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
 import { categoryOptions, HeritageSchema } from "@/utils/HeritageAssist";
 import Image from "next/image";
-import { uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
+import { deleteFromCloudinary, uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
+import { useSnackbar } from "@/components/feedback/SnackbarContext";
 
 const HeritageEditSchema = HeritageSchema.extend({
   image: HeritageSchema.shape.image.optional(),
@@ -39,12 +43,14 @@ const HeritageEditModal = ({
   open,
   close,
   heritageData,
-  setHeritageList
+  setHeritageList,
 }: {
   open: boolean;
   close: () => void;
   heritageData: HeritageDataTYPE | undefined;
-  setHeritageList: React.Dispatch<React.SetStateAction<HeritageDataTYPE[] | undefined>>;
+  setHeritageList: React.Dispatch<
+    React.SetStateAction<HeritageDataTYPE[] | undefined>
+  >;
 }) => {
   // react form hook
   const {
@@ -65,6 +71,7 @@ const HeritageEditModal = ({
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const { showMessage } = useSnackbar();
 
   // update default value
   useEffect(() => {
@@ -86,10 +93,7 @@ const HeritageEditModal = ({
 
   useEffect(() => {
     if (!imageField) return;
-
     setPreviewImage(URL.createObjectURL(imageField));
-
-    console.log("Your new image value ", imageField);
   }, [imageField]);
 
   // Function to upload image to Cloudinary
@@ -116,11 +120,21 @@ const HeritageEditModal = ({
     }
 
     const dataUpdater = async () => {
-      let imageUrl: string | null = null;
+      let uploadedImgRes: CloudinaryUploadResponseTYPE = {
+        success: false,
+        imageUrl: null,
+        publicId: null,
+        error: "No image uploaded",
+      };
 
       // if image updated → upload it first
-      if (image) {
-        imageUrl = await uploadToCloudinary(image);
+      if (image && heritageData?.imgPublicId) {
+        uploadedImgRes = await uploadToCloudinary(image, "heritages");
+        await deleteFromCloudinary(heritageData.imgPublicId);
+        if (!uploadedImgRes.success) {
+          console.log("Image upload failed, try again");
+          return;
+        }
       }
 
       // object to send to firebase
@@ -128,49 +142,50 @@ const HeritageEditModal = ({
 
       // ✅ Case 2: only image
       if (image && updatedField.length === 0) {
-        updatePayload = { image: imageUrl! };
+        updatePayload = { image: uploadedImgRes.imageUrl! };
       }
 
       // ✅ Case 3: image + fields
       if (image && updatedField.length > 0) {
         updatedField.forEach((field) => {
-          // @ts-expect-error add those updated updated data into updatePayload object 
+          // @ts-expect-error add those updated updated data into updatePayload object
           updatePayload[field as keyof HeritageDataTYPE] =
             data[field as keyof HeritageFormDataTYPE];
         });
-        updatePayload.image = imageUrl!;
+        updatePayload.image = uploadedImgRes.imageUrl!;
       }
 
       // ✅ Case 4: only fields
       if (!image && updatedField.length > 0) {
         updatedField.forEach((field) => {
-          // @ts-expect-error add those updated updated data into updatePayload object 
+          // @ts-expect-error add those updated updated data into updatePayload object
           updatePayload[field as keyof HeritageDataTYPE] =
             data[field as keyof HeritageFormDataTYPE];
         });
       }
 
-      // update heritage list state 
-      setHeritageList((prevState) => {
-        if (!prevState?.length) return prevState;
-
-        return prevState.map((item) => {
-          if (item.id === heritageData?.id) {
-            return { ...item, ...updatePayload };
-          }
-          return item;
-        });
-      });
-
       // finally update in firebase
-      
-
       try {
         if (heritageData?.id) {
           const ref = doc(db, "heritages", heritageData?.id);
           await updateDoc(ref, updatePayload);
+
+          // update heritage list state
+          setHeritageList((prevState) => {
+            if (!prevState?.length) return prevState;
+
+            return prevState.map((item) => {
+              if (item.id === heritageData?.id) {
+                return { ...item, ...updatePayload };
+              }
+              return item;
+            });
+          });
+
+          showMessage("Heritage updated successfully", "success");
         }
       } catch (error) {
+        showMessage("Heritage update failed", "error");
         console.log("document update fail, something went wrong", error);
       }
 
@@ -273,8 +288,8 @@ const HeritageEditModal = ({
               {/* current image  */}
               <Box>
                 <Image
-                  width={200}
-                  height={200}
+                  width={250}
+                  height={125}
                   src={heritageData?.image}
                   alt="Heritage Image"
                 />
@@ -290,8 +305,8 @@ const HeritageEditModal = ({
               {previewImage !== null && (
                 <Box>
                   <Image
-                    width={200}
-                    height={200}
+                    width={250}
+                    height={125}
                     src={previewImage}
                     alt="Heritage Image"
                   />
