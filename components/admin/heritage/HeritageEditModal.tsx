@@ -45,6 +45,7 @@ const HeritageEditModal = ({
   close,
   heritageData,
   setHeritageList,
+  resetSelectedHeritage
 }: {
   open: boolean;
   close: () => void;
@@ -52,6 +53,7 @@ const HeritageEditModal = ({
   setHeritageList: React.Dispatch<
     React.SetStateAction<HeritageDataTYPE[] | undefined>
   >;
+  resetSelectedHeritage: () => void;
 }) => {
   // react form hook
   const {
@@ -185,9 +187,11 @@ const HeritageEditModal = ({
           });
 
           showMessage("Heritage updated successfully", "success");
+          resetSelectedHeritage();
         }
       } catch (error) {
         showMessage("Heritage update failed", "error");
+        resetSelectedHeritage();
         console.log("document update fail, something went wrong", error);
       }
 
@@ -376,7 +380,7 @@ const HeritageEditModal = ({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={close} variant="contained" color="error">
+        <Button onClick={() => { close(); resetSelectedHeritage(); }} variant="contained" color="error">
           Cancel
         </Button>
         <Button

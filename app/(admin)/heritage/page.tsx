@@ -7,12 +7,13 @@ import { collection, query, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { FeedbackSnackbarTYPE, HeritageDataTYPE } from "@/types/AllTypes";
 import { db } from "@/firebase/firebaseConfig";
 import DeleteConfirmationDialog from "@/components/feedback/DeleteConfirmationDialog";
-import FeedbackSnackbar from "@/components/feedback/FeedbackSnackbar";
 import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";
 import HeritagePageSkeleton from "@/components/skeleton/HeritagePageSkeleton";
 import { UserContext } from "@/contexts/UserContext";
 import NoHeritageFound from "@/components/noHeritageFound";
 import { deleteFromCloudinary } from "@/utils/cloudinaryAssistFunction";
+import HeritageCardSkeleton from "@/components/skeleton/HeritageCardSkeleton";
+import { useSnackbar } from "@/components/feedback/SnackbarContext";
 
 type HeritageViewState = "all" | "my";
 
@@ -27,15 +28,11 @@ const AllHeritage = () => {
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
     useState<boolean>(false);
   const [selectedHeritage, setSelectedHeritage] = useState<string | null>(null);
-  const [deleteFeedback, setDeleteFeedback] = useState<FeedbackSnackbarTYPE>({
-    open: false,
-    title: "",
-    alertType: "success",
-  });
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const [heritageViewState, setHeritageViewState] =
     useState<HeritageViewState>("my");
   const currentUser = React.useContext(UserContext);
+  const { showMessage } = useSnackbar();
 
   useEffect(() => {
     const fetchHeritageDocs = async () => {
@@ -117,35 +114,19 @@ const AllHeritage = () => {
             return prevState?.filter((item) => item.id !== selectedHeritage);
           });
 
-          setDeleteFeedback({
-            open: true,
-            title: "Heritage deleted successfully",
-            alertType: "success",
-          });
+          showMessage("Heritage deleted successfully", "success");
+          setSelectedHeritage(null);
         } else {
-          setDeleteFeedback({
-            open: true,
-            title: imgDeleteRes.error || "Failed to delete heritage image",
-            alertType: "error",
-          });
+          showMessage(imgDeleteRes.error || "Failed to delete heritage image", "error");
+          setSelectedHeritage(null);
         }
       } catch (error) {
-        console.error("Error removing document: ", error);
-        setDeleteFeedback({
-          open: true,
-          title: "Error deleting heritage",
-          alertType: "error",
-        });
+        showMessage("Failed to delete heritage", "error");
+        setSelectedHeritage(null);
       }
     }
   };
 
-  const closeSnackbar = () => {
-    setDeleteFeedback((prevState) => ({
-      ...prevState,
-      open: false,
-    }));
-  };
 
   return (
     <>
@@ -182,17 +163,21 @@ const AllHeritage = () => {
         <NoHeritageFound />
       ) : (
         <Grid container spacing={3}>
-          {heritageList?.map((heritage) => {
+          {heritageList?.map((heritage, index) => {
             return (
               <Grid
                 key={heritage.id}
                 size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }}
               >
-                <HeritageCard
-                  data={heritage}
-                  showEditForm={showEditHeritageHandler}
-                  delete={confirmBeforeDeleteHandler}
-                />
+                {selectedHeritage === heritage.id ? (
+                  <HeritageCardSkeleton />
+                ) : (
+                  <HeritageCard
+                    data={heritage}
+                    showEditForm={showEditHeritageHandler}
+                    delete={confirmBeforeDeleteHandler}
+                  />
+                )}
               </Grid>
             );
           })}
@@ -208,20 +193,16 @@ const AllHeritage = () => {
 
       <HeritageEditModal
         open={showEdit}
-        close={() => setShowEdit(false)}
+        close={() => {
+          setShowEdit(false);
+        }}
         heritageData={heritageList?.find(
           (item) => item.id === selectedHeritage
         )}
         setHeritageList={setHeritageList}
+        resetSelectedHeritage={() => setSelectedHeritage(null)}
       />
 
-      {/* feedback after completing operation  */}
-      <FeedbackSnackbar
-        open={deleteFeedback?.open}
-        title={deleteFeedback?.title}
-        alertType={deleteFeedback?.alertType}
-        setOpen={closeSnackbar}
-      />
     </>
   );
 };
