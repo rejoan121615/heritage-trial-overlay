@@ -171,12 +171,12 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
       if (name) updatePayload.name = name;
       if (email) updatePayload.email = email;
       // upload image Cloudinary
-      if (image) {
+      if (image && currentUser?.userId) {
         if (currentUser?.imgPublicId) {
           await deleteFromCloudinary(currentUser.imgPublicId);
         }
 
-        imgUploadRes = await uploadToCloudinary(image, "users");
+        imgUploadRes = await uploadToCloudinary(image, currentUser.userId, "profile");
         console.log(" image upload response ", imgUploadRes);
         if (imgUploadRes.success) {
           updatePayload.image = imgUploadRes.imageUrl

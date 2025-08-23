@@ -7,11 +7,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file");
     const folderName = formData.get("folder");
-
-    const folder =
-      typeof folderName === "string" && folderName.length > 0
-        ? folderName
-        : "heritages";
+    const userId = formData.get("userId");
 
     if (!file || typeof file === "string") {
       const res: CloudinaryUploadResponseTYPE = {
@@ -55,9 +51,9 @@ export async function POST(req: NextRequest) {
 
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder,
+          folder: `users/${userId?.toString()}/${folderName?.toString()}`,
           transformation:
-            folderName === "heritages"
+            folderName?.toString() === "heritages"
               ? heritageTransformation
               : userTransformation,
         },

@@ -7,11 +7,13 @@ import {
 
 export const uploadToCloudinary = async (
   file: File,
-  folder: "heritages" | "users",
+  userId: string,
+  folder: "heritages" | "profile",
 ): Promise<CloudinaryUploadResponseTYPE> => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("folder", folder);
+  formData.append("userId", userId);
 
   try {
     const response = await fetch("/api/cloudinary/upload", {

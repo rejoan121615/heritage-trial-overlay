@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   CloudinaryUploadResponseTYPE,
   HeritageDataTYPE,
@@ -32,6 +32,7 @@ import { deleteFromCloudinary, uploadToCloudinary } from "@/utils/cloudinaryAssi
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useSnackbar } from "@/components/feedback/SnackbarContext";
+import { UserContext } from "@/contexts/UserContext";
 
 const HeritageEditSchema = HeritageSchema.extend({
   image: HeritageSchema.shape.image.optional(),
@@ -72,6 +73,7 @@ const HeritageEditModal = ({
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { showMessage } = useSnackbar();
+  const currentUser = useContext(UserContext);
 
   // update default value
   useEffect(() => {
@@ -128,8 +130,8 @@ const HeritageEditModal = ({
       };
 
       // if image updated → upload it first
-      if (image && heritageData?.imgPublicId) {
-        uploadedImgRes = await uploadToCloudinary(image, "heritages");
+      if (image && heritageData?.imgPublicId && currentUser?.userId) {
+        uploadedImgRes = await uploadToCloudinary(image, currentUser?.userId, "heritages");
         await deleteFromCloudinary(heritageData.imgPublicId);
         if (!uploadedImgRes.success) {
           console.log("Image upload failed, try again");

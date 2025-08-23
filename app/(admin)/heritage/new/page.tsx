@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Paper,
   Stack,
@@ -27,12 +27,14 @@ import { uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
 import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
 import { useSnackbar } from "@/components/feedback/SnackbarContext";
 import { CloudinaryUploadResponseTYPE } from "@/types/AllTypes";
+import { UserContext } from "@/contexts/UserContext"; 
 
 type HeritageFormDataTYPE = z.infer<typeof HeritageSchema>;
 
 const NewHeritagePage = () => {
   const router = useRouter();
   const { showMessage } = useSnackbar();
+  const currentUser = useContext(UserContext);
 
   const {
     handleSubmit,
@@ -50,7 +52,6 @@ const NewHeritagePage = () => {
     setLoading(true);
 
     const { title, summary, location, category, image } = data;
-    const currentUser = auth.currentUser;
 
     try {
 
@@ -61,8 +62,8 @@ const NewHeritagePage = () => {
         publicId: null,
       };
 
-      if (image) {
-        imageUrl = await uploadToCloudinary(image, 'heritages');
+      if (image && currentUser?.userId) {
+        imageUrl = await uploadToCloudinary(image, currentUser.userId, 'heritages');
       }
 
       // upload heritage record into db
@@ -74,7 +75,7 @@ const NewHeritagePage = () => {
         image:  imageUrl.success ? imageUrl.imageUrl : null,
         imgPublicId:  imageUrl.success ? imageUrl.publicId : null,
         createdAt: serverTimestamp(),
-        userId: currentUser?.uid,
+        userId: currentUser?.userId,
       });
 
       setLoading(false);
@@ -122,7 +123,6 @@ const NewHeritagePage = () => {
           error={!!errors.summary}
           helperText={errors.summary?.message}
         />
-
         <TextField
           id="outlined-basic"
           label="Location:"
