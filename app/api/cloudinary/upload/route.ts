@@ -26,21 +26,40 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await (file as File).arrayBuffer());
 
     const result = await new Promise<any>((resolve, reject) => {
+      const heritageTransformation = [
+        {
+          aspect_ratio: "2.0",
+          crop: "fill",
+          width: "1000",
+          height: "500",
+        },
+        {
+          quality: "auto",
+          fetch_format: "auto",
+        },
+      ];
+
+      const userTransformation = [
+        {
+          width: 300,
+          height: 300,
+          crop: "fill",
+          gravity: "auto",
+          quality: "auto",
+        },
+        {
+          quality: "auto",
+          fetch_format: "auto",
+        },
+      ];
+
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder,
-          transformation: [
-            {
-              aspect_ratio: "2.0",
-              crop: "fill",
-              width: "1000",
-              height: "500",
-            },
-            {
-              quality: "auto",
-              fetch_format: "auto",
-            },
-          ],
+          transformation:
+            folderName === "heritages"
+              ? heritageTransformation
+              : userTransformation,
         },
         (error, result) => {
           if (error) return reject(error);

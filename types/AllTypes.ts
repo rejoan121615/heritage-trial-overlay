@@ -27,6 +27,8 @@ export type UserTYPE = {
   userId: string;
   name: string;
   email: string;
+  image: string;
+  imgPublicId: string;
   totalHeritage: number;
   status: "pending" | "block" | "active";
   isAdmin: boolean;

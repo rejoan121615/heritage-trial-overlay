@@ -7,6 +7,7 @@ import {
   TextField,
   Box,
   IconButton,
+  Typography,
 } from "@mui/material";
 import HeritageDetailsRow from "../heritage/HeritageDetailsRow";
 import z from "zod";
@@ -26,13 +27,18 @@ import { auth, db } from "@/firebase/firebaseConfig";
 import { useSnackbar } from "@/components/feedback/SnackbarContext";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, updateDoc } from "firebase/firestore";
+import { CloudinaryUploadResponseTYPE, UserTYPE } from "@/types/AllTypes";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "@/utils/cloudinaryAssistFunction";
 
 const ProfileEditSchema = z
   .object({
     image: z
       .instanceof(File, { message: "Please upload a file" })
-      .refine((file) => file.size <= 2 * 1024 * 1024, {
-        message: "File size must be less than 2MB",
+      .refine((file) => file.size <= 5 * 1024 * 1024, {
+        message: "File size must be less than 5MB",
       })
       .refine((file) => file.type.startsWith("image/"), {
         message: "Only image files are allowed",
@@ -115,6 +121,8 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
   const submitHandler = async (data: ProfileEditTYPE) => {
     const { image, name, email, oldPassword, password } = data;
 
+    console.log("your form data ", data);
+
     if (!auth.currentUser) return;
     const user = auth.currentUser;
 
@@ -153,21 +161,38 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
 
       // -------- Update Firestore users record -------- //
       const userRef = doc(db, "users", user.uid);
-      const updatePayload: any = {};
+      const updatePayload: Partial<UserTYPE> = {};
+      let imgUploadRes: CloudinaryUploadResponseTYPE = {
+        success: false,
+        imageUrl: null,
+        publicId: null,
+      };
 
       if (name) updatePayload.name = name;
       if (email) updatePayload.email = email;
+      // upload image Cloudinary
       if (image) {
-        // upload image first → Cloudinary/Storage → get url
-        // example: const imageUrl = await uploadToCloudinary(image)
-        // updatePayload.image = imageUrl
+        if (currentUser?.imgPublicId) {
+          await deleteFromCloudinary(currentUser.imgPublicId);
+        }
+
+        imgUploadRes = await uploadToCloudinary(image, "users");
+        console.log(" image upload response ", imgUploadRes);
+        if (imgUploadRes.success) {
+          updatePayload.image = imgUploadRes.imageUrl
+            ? imgUploadRes.imageUrl
+            : "";
+          updatePayload.imgPublicId = imgUploadRes.publicId
+            ? imgUploadRes.publicId
+            : "";
+        }
       }
 
       if (Object.keys(updatePayload).length > 0) {
         await updateDoc(userRef, updatePayload);
       }
 
-      showMessage("✅ Profile updated successfully", "success");
+      showMessage("Profile updated successfully", "success");
     } catch (error: any) {
       console.error(error);
       showMessage(error.message || "Profile update failed", "error");
@@ -188,14 +213,18 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
       }}
       onSubmit={handleSubmit(submitHandler)}
     >
-      {/* title  */}
+      {/* profile image  */}
       <HeritageDetailsRow title="Profile Image">
         <Grid container>
           <Box sx={{ width: "150px", height: "150px", position: "relative" }}>
             <Avatar
               alt="Mohd Rejoan"
               sx={{ width: "150px", height: "150px" }}
-              src={preview === null ? "" : URL.createObjectURL(preview)}
+              src={
+                preview === null
+                  ? currentUser?.image
+                  : URL.createObjectURL(preview)
+              }
             />
             <IconButton
               component={"label"}
@@ -215,19 +244,25 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
                   if (e.target.files?.[0]) {
                     const file = e.target.files[0];
                     setPreview(file);
+                    // update form value
+                    reset({
+                      image: file,
+                    });
                   }
                 }}
               />
             </IconButton>
           </Box>
         </Grid>
+
+        {!!errors.image?.message && <Typography color="error">{errors.image.message}</Typography>}
       </HeritageDetailsRow>
 
       <Grid size={12} sx={{ marginTop: { xs: "15px", sm: "0px" } }}>
         <Divider />
       </Grid>
 
-      {/* title  */}
+      {/* profile image  */}
       <HeritageDetailsRow title="Full Name">
         <TextField
           size={"small"}
@@ -239,7 +274,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
         />
       </HeritageDetailsRow>
 
-      {/* Image  */}
+      {/* profile email  */}
       <HeritageDetailsRow title="Email">
         <TextField
           size="small"
@@ -251,7 +286,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
         />
       </HeritageDetailsRow>
 
-      {/* summary  */}
+      {/* profile old password  */}
       <HeritageDetailsRow title="Old Password">
         <TextField
           size="small"
@@ -263,7 +298,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
         />
       </HeritageDetailsRow>
 
-      {/* summary  */}
+      {/* profile new password  */}
       <HeritageDetailsRow title="New Password">
         <TextField
           size="small"
@@ -275,7 +310,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
         />
       </HeritageDetailsRow>
 
-      {/* Location  */}
+      {/* profile confirm password  */}
       <HeritageDetailsRow title="Confirm Password">
         <TextField
           size="small"
@@ -291,7 +326,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
         <Divider />
       </Grid>
 
-      {/* Action buttons  */}
+      {/* profile action buttons  */}
       <HeritageDetailsRow title="">
         <Button variant="contained" color="primary" type="submit">
           Submit Change

@@ -28,8 +28,6 @@ export const uploadToCloudinary = async (
       };
     }
 
-
-
     const { success, imageUrl, publicId }: CloudinaryUploadResponseTYPE =
       await response.json();
 

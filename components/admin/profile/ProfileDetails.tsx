@@ -86,7 +86,7 @@ const ProfileDetails = ({
     >
       {/* title  */}
       <HeritageDetailsRow title="Profile Image">
-        <Avatar alt="Mohd Rejoan" sx={{ width: "150px", height: "150px" }} />
+        <Avatar alt="Mohd Rejoan" sx={{ width: "150px", height: "150px" }} src={userData.image} />
       </HeritageDetailsRow>
 
       <Grid size={12} sx={{ marginTop: { xs: "15px", sm: "0px" } }}>
