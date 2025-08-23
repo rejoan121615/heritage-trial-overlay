@@ -1,19 +1,13 @@
 "use client";
 
 import { InputAdornment, TextField, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import FormWrapper from "@/components/form/FormWrap";
 import { useForm } from "react-hook-form";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
-import KeyIcon from "@mui/icons-material/Key";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FirebaseError } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/firebase/firebaseConfig";
-import { useRouter } from "next/navigation";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { UserTYPE } from "@/types/AllTypes";
+import { auth } from "@/firebase/firebaseConfig";
 import { useSnackbar } from "@/components/feedback/SnackbarContext";
 import { sendPasswordResetEmail } from "firebase/auth";
 
@@ -29,7 +23,6 @@ const LoginPage = () => {
     handleSubmit,
     register,
     formState: { errors },
-    setError,
   } = useForm<LoginFormTYPE>({
     resolver: zodResolver(LoginSchema),
     mode: "all",
@@ -38,7 +31,6 @@ const LoginPage = () => {
     },
   });
 
-  const router = useRouter();
   const [submitProgress, setSubmitProgress] = useState<boolean>(false);
   const { showMessage } = useSnackbar();
   const [emailSendAlready, setEmailSendAlready] = useState<boolean>(false);
