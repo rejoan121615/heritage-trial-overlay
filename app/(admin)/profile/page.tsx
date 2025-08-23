@@ -1,39 +1,21 @@
 "use client";
 
-import React, { use, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Card,
-  Box,
-  Button,
-  Typography,
-  Grid,
-  Divider,
-  Avatar,
+  Box
 } from "@mui/material";
-import Image from "next/image";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
-import { HeritageDataTYPE } from "@/types/AllTypes";
-import QRCode from "qrcode";
-import { QrCode } from "@mui/icons-material";
-import HeritageDetailsRow from "@/components/admin/heritage/HeritageDetailsRow";
-import HeritageDetailsSkeleton from "@/components/skeleton/HeritageDetailsSkeleton";
 import ProfileSkeleton from "@/components/skeleton/ProfileSkeleton";
 import { UserContext } from "@/contexts/UserContext";
 import ProfileDetails from "@/components/admin/profile/ProfileDetails";
 import ProfileEdit from "@/components/admin/profile/ProfileEdit";
-import { userInfo } from "os";
 
 
 type ProfileStateTYPE = 'profile' | 'profileEdit'
 
-const ProfilePage = ({
-  params,
-}: {
-  params: Promise<{ heritageId: string }>;
-}) => {
+const ProfilePage = () => {
 
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [currentWindow, setcurrentWindow] = useState<ProfileStateTYPE>('profile');
   const [applyEdit, setApplyEdit] = useState(false);
 

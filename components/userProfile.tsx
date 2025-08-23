@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Divider, Avatar, Typography, Button } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { UserContext } from 'contexts/UserContext'
 
 const UserProfile = ({logout} : {logout: () => void}) => {
-  const [user, loading, error] = useAuthState(auth);
-  const currentUser = React.useContext(UserContext);
+  const [authUser] = useAuthState(auth);
+  const { user } = useContext(UserContext);
 
   return (
     <Box>
@@ -20,8 +20,8 @@ const UserProfile = ({logout} : {logout: () => void}) => {
           textAlign: "center",
         }}
       >
-        <Avatar alt="Remy Sharp" src={currentUser?.image} />
-        <Typography sx={{ textTransform: 'capitalize' }}>{ user?.displayName }</Typography>
+        <Avatar alt="Remy Sharp" src={user?.image} />
+        <Typography sx={{ textTransform: 'capitalize' }}>{ authUser?.displayName }</Typography>
         <Button variant="contained" color="error" onClick={logout} sx={{ borderRadius: '5px'}}>
           Logout
         </Button>

@@ -25,13 +25,13 @@ import {
 } from "firebase/auth";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { useSnackbar } from "@/components/feedback/SnackbarContext";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { CloudinaryUploadResponseTYPE, UserTYPE } from "@/types/AllTypes";
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
 } from "@/utils/cloudinaryAssistFunction";
+import { FirebaseError } from "firebase/app";
 
 const ProfileEditSchema = z
   .object({
@@ -122,7 +122,7 @@ const ProfileEdit = ({
       name: user?.name,
       email: user?.email,
     });
-  }, []);
+  }, [reset, user?.email, user?.name]);
 
   const submitHandler = async (data: ProfileEditTYPE) => {
     const { image, name, email, oldPassword, password } = data;
@@ -137,18 +137,20 @@ const ProfileEdit = ({
       // handle dublicate email
       try {
         await updateEmail(authUser, email);
-      } catch (error: any) {
-        if (error.code === "auth/email-already-in-use") {
-          showMessage(
-            "Email update failed as it is already attached to another account",
-            "error"
-          );
-          setApplyEdit(false);
-        } else {
-          showMessage("Email update failed", "error");
-          setApplyEdit(false);
+      } catch (error) {
+        if (error instanceof FirebaseError) {
+          if (error.code === "auth/email-already-in-use") {
+            showMessage(
+              "Email update failed as it is already attached to another account",
+              "error"
+            );
+            setApplyEdit(false);
+          } else {
+            showMessage("Email update failed", "error");
+            setApplyEdit(false);
+          }
+          return;
         }
-        return;
       }
 
       // update profile name
@@ -183,11 +185,7 @@ const ProfileEdit = ({
           await deleteFromCloudinary(user.imgPublicId);
         }
 
-        imgUploadRes = await uploadToCloudinary(
-          image,
-          user.userId,
-          "profile"
-        );
+        imgUploadRes = await uploadToCloudinary(image, user.userId, "profile");
         console.log(" image upload response ", imgUploadRes);
         if (imgUploadRes.success) {
           updatePayload.image = imgUploadRes.imageUrl
@@ -204,7 +202,7 @@ const ProfileEdit = ({
       }
 
       showMessage("Profile updated successfully", "success");
-      // update user state 
+      // update user state
       setUser((prevState) => {
         if (!prevState) return prevState;
         return {
@@ -212,13 +210,15 @@ const ProfileEdit = ({
           name: updatePayload.name ? updatePayload.name : prevState.name,
           email: updatePayload.email ? updatePayload.email : prevState.email,
           image: updatePayload.image ? updatePayload.image : prevState.image,
-          imgPublicId: updatePayload.imgPublicId ? updatePayload.imgPublicId : prevState.imgPublicId,
-        }
+          imgPublicId: updatePayload.imgPublicId
+            ? updatePayload.imgPublicId
+            : prevState.imgPublicId,
+        };
       });
       setApplyEdit(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      showMessage(error.message || "Profile update failed", "error");
+      showMessage("Profile update failed", "error");
       setApplyEdit(false);
     }
   };
@@ -245,9 +245,7 @@ const ProfileEdit = ({
               alt="Mohd Rejoan"
               sx={{ width: "150px", height: "150px" }}
               src={
-                preview === null
-                  ? user?.image
-                  : URL.createObjectURL(preview)
+                preview === null ? user?.image : URL.createObjectURL(preview)
               }
             />
             <IconButton

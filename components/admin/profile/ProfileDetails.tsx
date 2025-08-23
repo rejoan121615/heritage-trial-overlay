@@ -9,8 +9,6 @@ import {
   Chip,
 } from "@mui/material";
 import HeritageDetailsRow from "../heritage/HeritageDetailsRow";
-import { UserContext } from "@/contexts/UserContext";
-import { createContext } from "vm";
 import { UserTYPE } from "@/types/AllTypes";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
@@ -24,7 +22,7 @@ const ProfileDetails = ({
   userData: UserTYPE;
   allowEdit: () => void;
 }) => {
-  const [user, loading, error] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const { showMessage } = useSnackbar();
   const [startVerification, setStartVerification] = useState<boolean>(false);
 
@@ -71,7 +69,7 @@ const ProfileDetails = ({
       clearInterval(timer);
     }
     
-  }, [startVerification]);
+  }, [startVerification, showMessage, user]);
 
   return (
     <Grid

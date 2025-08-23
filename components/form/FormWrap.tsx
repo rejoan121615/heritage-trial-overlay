@@ -113,7 +113,7 @@ const FormWrapper = ({
                   columnGap: "5px",
                 }}
               >
-                <Typography>Does't have an account?</Typography>
+                <Typography>Doesn&apos;t have an account?</Typography>
                 <Link href={`/register`}>Register</Link>
               </Box>
               <Box

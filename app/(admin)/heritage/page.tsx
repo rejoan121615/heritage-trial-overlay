@@ -3,8 +3,16 @@
 import React, { useEffect, useState } from "react";
 import HeritageCard from "@/components/admin/heritage/HeritageCard";
 import { Button, Grid, Paper } from "@mui/material";
-import { collection, query, getDocs, doc, deleteDoc } from "firebase/firestore";
-import { FeedbackSnackbarTYPE, HeritageDataTYPE } from "@/types/AllTypes";
+import {
+  collection,
+  query,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
+import { HeritageDataTYPE } from "@/types/AllTypes";
 import { db } from "@/firebase/firebaseConfig";
 import DeleteConfirmationDialog from "@/components/feedback/DeleteConfirmationDialog";
 import HeritageEditModal from "@/components/admin/heritage/HeritageEditModal";
@@ -62,6 +70,7 @@ const AllHeritage = () => {
 
   // heritage list state updater
   useEffect(() => {
+    console.log('run heritage snapshort ', heritageDocumentSnapshort)
     if (user && heritageDocumentSnapshort) {
       if (heritageViewState === "my") {
         const myHeritageList = heritageDocumentSnapshort?.filter(
@@ -92,41 +101,49 @@ const AllHeritage = () => {
       const document = doc(db, "heritages", selectedHeritage);
 
       // test image delete function
-      let selectedHeritageData = heritageList?.find(
+      const selectedHeritageData = heritageList?.find(
         (item) => item.id === selectedHeritage
       );
 
-      // delete image from cloudinary
-      if (!selectedHeritageData?.imgPublicId) return;
-
       try {
-        const imgDeleteRes = await deleteFromCloudinary(
-          selectedHeritageData?.imgPublicId
-        );
+        if (selectedHeritageData?.imgPublicId) {
+          await deleteFromCloudinary(selectedHeritageData?.imgPublicId);
+        }
 
-        if (imgDeleteRes.success) {
-          // delete record from firebase
-          await deleteDoc(document);
+        await deleteDoc(document);
 
-          setSelectedHeritage(null);
-          // delete from local state
-          setHeritageList((prevState) => {
-            return prevState?.filter((item) => item.id !== selectedHeritage);
+        setHeritageDocumentSnapshort((prevState) => {
+          return prevState ? prevState.filter((item) => item.id !== selectedHeritage) : null;
+        });
+
+        if (user?.userId && user?.totalHeritage > 0) {
+          const userRef = doc(db, "users", user.userId);
+          await updateDoc(userRef, {
+            totalHeritage: increment(-1),
           });
 
-          showMessage("Heritage deleted successfully", "success");
-          setSelectedHeritage(null);
-        } else {
-          showMessage(imgDeleteRes.error || "Failed to delete heritage image", "error");
-          setSelectedHeritage(null);
+          setUser((prevState) => {
+            if (!prevState) return prevState;
+            return {
+              ...prevState,
+              totalHeritage: prevState?.totalHeritage - 1,
+            };
+          });
         }
+
+        showMessage("Heritage deleted successfully", "success");
+        setSelectedHeritage(null);
       } catch (error) {
         showMessage("Failed to delete heritage", "error");
         setSelectedHeritage(null);
+        console.log(error);
       }
     }
   };
 
+  useEffect(() => {
+    console.log('updated heritage list', heritageList)
+  }, [heritageList])
 
   return (
     <>
@@ -163,7 +180,7 @@ const AllHeritage = () => {
         <NoHeritageFound />
       ) : (
         <Grid container spacing={3}>
-          {heritageList?.map((heritage, index) => {
+          {heritageList?.map((heritage) => {
             return (
               <Grid
                 key={heritage.id}
@@ -202,7 +219,6 @@ const AllHeritage = () => {
         setHeritageList={setHeritageList}
         resetSelectedHeritage={() => setSelectedHeritage(null)}
       />
-
     </>
   );
 };

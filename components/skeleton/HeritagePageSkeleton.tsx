@@ -1,5 +1,5 @@
 import React from "react";
-import { Skeleton, Box, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import HeritageCardSkeleton from "./HeritageCardSkeleton";
 
 const HeritagePageSkeleton = () => {

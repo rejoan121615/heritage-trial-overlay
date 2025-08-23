@@ -50,6 +50,7 @@ const LoginPage = () => {
       showMessage("Failed to send password reset email.", "error");
       setSubmitProgress(false);
       setEmailSendAlready(false);
+      console.log(error);
     }
   };
 

@@ -14,18 +14,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(res, { status: 400 })
     }
 
-    let cloudinaryResponse = await cloudinary.uploader.destroy(public_id);
-    console.log('---------', cloudinaryResponse);
-
+    await cloudinary.uploader.destroy(public_id);
     const res: CloudinaryDeleteResponseTYPE = {
       success: true
     }
     return NextResponse.json(res)
-  } catch (err: any) {
+  } catch (err) {
     console.error(err)
     const res: CloudinaryDeleteResponseTYPE = {
       success: false,
-      error: err.message
+      error: 'Something went wrong, please try again later.'
     }
     return NextResponse.json(res, { status: 500 })
   }

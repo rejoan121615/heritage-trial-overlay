@@ -19,22 +19,29 @@ import {
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db, auth } from "@/firebase/firebaseConfig";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+  doc,
+  increment,
+} from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { categoryOptions, HeritageSchema } from "@/utils/HeritageAssist";
 import { uploadToCloudinary } from "@/utils/cloudinaryAssistFunction";
 import VisuallyHiddenInput from "@/components/CustomComponent/VisuallyHiddenInput";
 import { useSnackbar } from "@/components/feedback/SnackbarContext";
 import { CloudinaryUploadResponseTYPE } from "@/types/AllTypes";
-import { UserContext } from "@/contexts/UserContext"; 
+import { UserContext } from "@/contexts/UserContext";
 
 type HeritageFormDataTYPE = z.infer<typeof HeritageSchema>;
 
 const NewHeritagePage = () => {
   const router = useRouter();
   const { showMessage } = useSnackbar();
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const {
     handleSubmit,
@@ -54,6 +61,11 @@ const NewHeritagePage = () => {
     const { title, summary, location, category, image } = data;
 
     try {
+      if (!user?.userId) {
+        showMessage("User not found", "error");
+        setLoading(false);
+        return;
+      }
 
       let imageUrl: CloudinaryUploadResponseTYPE = {
         success: false,
@@ -63,7 +75,7 @@ const NewHeritagePage = () => {
       };
 
       if (image && user?.userId) {
-        imageUrl = await uploadToCloudinary(image, user.userId, 'heritages');
+        imageUrl = await uploadToCloudinary(image, user.userId, "heritages");
       }
 
       // upload heritage record into db
@@ -72,17 +84,26 @@ const NewHeritagePage = () => {
         summary,
         location,
         category,
-        image:  imageUrl.success ? imageUrl.imageUrl : null,
-        imgPublicId:  imageUrl.success ? imageUrl.publicId : null,
+        image: imageUrl.success ? imageUrl.imageUrl : null,
+        imgPublicId: imageUrl.success ? imageUrl.publicId : null,
         createdAt: serverTimestamp(),
         userId: user?.userId,
       });
 
+      // update user total heritage record count
+      const userRef = doc(db, "users", user.userId);
+      await updateDoc(userRef, {
+        totalHeritage: increment(1),
+      });
+
+      setUser((prevState) => {
+        if (!prevState) return prevState;
+        return { ...prevState, totalHeritage: (prevState?.totalHeritage + 1) };
+      });
+
       setLoading(false);
       router.push("/heritage");
-
       showMessage("Heritage record added successfully", "success");
-
     } catch (error) {
       console.log("something went wrong ", error);
       showMessage("Failed to add heritage record", "error");

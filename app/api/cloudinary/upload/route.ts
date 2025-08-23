@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import type { CloudinaryUploadResponseTYPE } from "@/types/AllTypes";
+import { UploadApiResponse, UploadApiErrorResponse } from "cloudinary";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await (file as File).arrayBuffer());
 
-    const result = await new Promise<any>((resolve, reject) => {
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
       const heritageTransformation = [
         {
           aspect_ratio: "2.0",
@@ -57,8 +58,14 @@ export async function POST(req: NextRequest) {
               ? heritageTransformation
               : userTransformation,
         },
-        (error, result) => {
+        (
+          error: UploadApiErrorResponse | undefined,
+          result: UploadApiResponse | undefined
+        ) => {
           if (error) return reject(error);
+          if (!result)
+            return reject(new Error("Cloudinary returned no result"));
+
           resolve(result);
         }
       );
@@ -72,13 +79,13 @@ export async function POST(req: NextRequest) {
     };
 
     return NextResponse.json(res);
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     const res: CloudinaryUploadResponseTYPE = {
       success: false,
       imageUrl: null,
       publicId: null,
-      error: err.message,
+      error: "Something went wrong, please try again later.",
     };
     return NextResponse.json(res, { status: 500 });
   }
