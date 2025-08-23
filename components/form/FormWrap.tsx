@@ -6,26 +6,24 @@ import {
   Stack,
   Typography,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
 import React, { ReactNode } from "react";
 import Link from "next/link";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const FormWrapper = ({
+  type,
   children,
-  helperNode,
-  title,
-  submitTitle,
   submit,
-  loading
+  loading,
+  disableSubmit,
 }: {
+  type: "login" | "register" | "resetPassword";
   children: ReactNode;
-  helperNode:
-    | { text: string; link: { url: string; title: string } }
-    | undefined;
-  title: string;
-  submitTitle: string;
   submit: () => void;
-  loading: boolean
+  loading: boolean;
+  disableSubmit?: boolean;
 }) => {
   return (
     <Box
@@ -45,9 +43,21 @@ const FormWrapper = ({
           padding: "20px",
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: "10px",
+          position: "relative",
         })}
         onSubmit={submit}
       >
+        {/* go back button  */}
+        {type === "resetPassword" && (
+          <Link href={"/login"}>
+            <IconButton
+              sx={{ position: "absolute", top: "10px", left: "10px" }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          </Link>
+        )}
+
         <Typography
           sx={{
             textAlign: "center",
@@ -56,7 +66,11 @@ const FormWrapper = ({
             letterSpacing: "1px",
           }}
         >
-          {title}
+          {type === "login"
+            ? "Login in your account"
+            : type === "register"
+            ? "Create a new account"
+            : "Reset your password"}
         </Typography>
         <Stack
           direction={"column"}
@@ -73,17 +87,68 @@ const FormWrapper = ({
             }
             size="large"
             type="submit"
-            sx={{ backgroundColor: "#292a33", color: "#FFF", padding: "15px" }}
+            sx={{
+              backgroundColor: disableSubmit ? "#ccc" : "#292a33",
+              color: "#FFF",
+              padding: "15px",
+            }}
+            disabled={loading || disableSubmit}
           >
-            {submitTitle}
+            {type === "login"
+              ? "Login"
+              : type === "register"
+              ? "Register"
+              : "Send Email"}
           </Button>
         </Stack>
-        {helperNode && Object.keys(helperNode).length ? (
-          <Typography sx={{ textAlign: "center" }}>
-            {helperNode.text}{" "}
-            <Link href={`${helperNode.link.url}`}>{helperNode.link.title}</Link>
-          </Typography>
-        ) : null}
+
+        <Box>
+          {type === "login" ? (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  columnGap: "5px",
+                }}
+              >
+                <Typography>Does't have an account?</Typography>
+                <Link href={`/register`}>Register</Link>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  columnGap: "5px",
+                }}
+              >
+                <Link href={`/reset-password`}>Forgot Password?</Link>
+              </Box>
+            </>
+          ) : type === "register" ? (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  columnGap: "5px",
+                }}
+              >
+                <Typography>Already have an account?</Typography>
+                <Link href={`/login`}>Login</Link>
+              </Box>
+            </>
+          ) : (
+            <>
+              <Typography sx={{ textAlign: "center" }}>
+                <Link href={`/email-verification`}></Link>
+              </Typography>
+            </>
+          )}
+        </Box>
       </Box>
     </Box>
   );

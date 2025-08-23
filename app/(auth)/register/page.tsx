@@ -80,15 +80,7 @@ const RegisterPage = () => {
 
   return (
     <FormWrapper
-      title="Register your account"
-      submitTitle="Register"
-      helperNode={{
-        text: "Already have an account?",
-        link: {
-          url: "/login",
-          title: "Login",
-        },
-      }}
+      type="register"
       submit={handleSubmit(onSubmit)}
       loading={false}
     >

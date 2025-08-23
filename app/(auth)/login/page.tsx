@@ -59,7 +59,7 @@ const LoginPage = () => {
           message: "Invalid email, check the email address.",
         });
         setSubmitProgress(false);
-        showMessage('Invalid email, Account verification failed', 'error');
+        showMessage("Invalid email, Account verification failed", "error");
         return;
       }
 
@@ -105,56 +105,46 @@ const LoginPage = () => {
   useEffect(() => {}, []);
 
   return (
-    <>
-      <FormWrapper
-        title="Login in your account"
-        submitTitle="Login"
-        helperNode={{
-          text: "Does't have an account?",
-          link: {
-            url: "/register",
-            title: "Register",
+    <FormWrapper
+      type="login"
+      submit={handleSubmit(onSubmit)}
+      loading={submitProgress}
+    >
+      <TextField
+        label="Email"
+        placeholder="eb@email.com"
+        size="medium"
+        {...register("email")}
+        error={!!errors.email}
+        helperText={errors.email?.message}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <AlternateEmailIcon />
+              </InputAdornment>
+            ),
           },
         }}
-        submit={handleSubmit(onSubmit)}
-        loading={submitProgress}
-      >
-        <TextField
-          label="Email"
-          placeholder="eb@email.com"
-          size="medium"
-          {...register("email")}
-          error={!!errors.email}
-          helperText={errors.email?.message}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AlternateEmailIcon />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-        <TextField
-          label="Password"
-          placeholder="Ex: 1@dfeE898o"
-          size="medium"
-          {...register("password")}
-          error={!!errors.password}
-          helperText={errors.password?.message}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <KeyIcon />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </FormWrapper>
-    </>
+      />
+      <TextField
+        label="Password"
+        placeholder="Ex: 1@dfeE898o"
+        size="medium"
+        {...register("password")}
+        error={!!errors.password}
+        helperText={errors.password?.message}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <KeyIcon />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+    </FormWrapper>
   );
 };
 
