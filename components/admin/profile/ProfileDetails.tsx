@@ -76,6 +76,7 @@ const ProfileDetails = ({
   return (
     <Grid
       container
+      alignItems={'center'}
       sx={{
         rowGap: { sm: "20px" },
         width: "100%",

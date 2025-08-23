@@ -6,7 +6,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/firebase/firebaseConfig";
 import LoadingPage from "@/components/feedback/LoadingPage";
-import { UserTYPE } from "@/types/AllTypes";
+import { UserContextTYPE, UserTYPE } from "@/types/AllTypes";
 import { doc, getDoc } from "firebase/firestore";
 import { UserContext } from "@/contexts/UserContext";
 
@@ -50,9 +50,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   // Block everything until we know if user is allowed
   if (loading || !canRender) return <LoadingPage />;
 
+  const userContextValue: UserContextTYPE = {
+    user: currentUserRecord,
+    setUser: setCurrentUserRecord,
+  };
+
   return (
     <>
-      <UserContext.Provider value={currentUserRecord}>
+      <UserContext.Provider value={userContextValue}>
         <Box sx={{ display: "flex" }}>
           {/* admin navbar  */}
           <AdminNavigation />

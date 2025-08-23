@@ -22,6 +22,7 @@ import ProfileSkeleton from "@/components/skeleton/ProfileSkeleton";
 import { UserContext } from "@/contexts/UserContext";
 import ProfileDetails from "@/components/admin/profile/ProfileDetails";
 import ProfileEdit from "@/components/admin/profile/ProfileEdit";
+import { userInfo } from "os";
 
 
 type ProfileStateTYPE = 'profile' | 'profileEdit'
@@ -32,34 +33,9 @@ const ProfilePage = ({
   params: Promise<{ heritageId: string }>;
 }) => {
 
-  const currentUser = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [currentWindow, setcurrentWindow] = useState<ProfileStateTYPE>('profile');
-
-
-  // fetch heritage data
-  useEffect(() => {
-    // const fetchDocument = async () => {
-    //   try {
-    //     const docRef = doc(db, "heritages", heritageId);
-    //     const docSnapshot = await getDoc(docRef);
-
-    //     if (docSnapshot.exists()) {
-    //       setHeritage({
-    //         id: docSnapshot.id,
-    //         ...docSnapshot.data(),
-    //       } as HeritageDataTYPE);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching heritage data:", error);
-    //     setHeritage(null);
-    //   }
-    // };
-
-    // if (heritageId) {
-    //   fetchDocument();
-    // }
-  }, []);
-
+  const [applyEdit, setApplyEdit] = useState(false);
 
 
   return (
@@ -74,12 +50,12 @@ const ProfilePage = ({
           },
         }}
       >
-        { currentUser == null ? (
+        { applyEdit || user == null ? (
           <ProfileSkeleton />
         ) : currentWindow === 'profile' ? (
-          <ProfileDetails userData={currentUser} allowEdit={ () => setcurrentWindow('profileEdit')} />
+          <ProfileDetails userData={user} allowEdit={ () => setcurrentWindow('profileEdit')} />
         ) : (
-          <ProfileEdit closeEdit={() => setcurrentWindow('profile')} />
+          <ProfileEdit closeEdit={() => setcurrentWindow('profile')} setApplyEdit={setApplyEdit} />
         )}
       </Box>
     </Card>

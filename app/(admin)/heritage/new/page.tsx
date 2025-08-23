@@ -34,7 +34,7 @@ type HeritageFormDataTYPE = z.infer<typeof HeritageSchema>;
 const NewHeritagePage = () => {
   const router = useRouter();
   const { showMessage } = useSnackbar();
-  const currentUser = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const {
     handleSubmit,
@@ -62,8 +62,8 @@ const NewHeritagePage = () => {
         publicId: null,
       };
 
-      if (image && currentUser?.userId) {
-        imageUrl = await uploadToCloudinary(image, currentUser.userId, 'heritages');
+      if (image && user?.userId) {
+        imageUrl = await uploadToCloudinary(image, user.userId, 'heritages');
       }
 
       // upload heritage record into db
@@ -75,7 +75,7 @@ const NewHeritagePage = () => {
         image:  imageUrl.success ? imageUrl.imageUrl : null,
         imgPublicId:  imageUrl.success ? imageUrl.publicId : null,
         createdAt: serverTimestamp(),
-        userId: currentUser?.userId,
+        userId: user?.userId,
       });
 
       setLoading(false);

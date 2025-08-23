@@ -28,7 +28,7 @@ const AdminNav = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const router = useRouter();
-  const currentUser = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -69,7 +69,7 @@ const AdminNav = () => {
         <Divider />
         <List>
           {NavList.map((Item) => {
-            if (Item.type === "admin" && !currentUser?.isAdmin) return null;
+            if (Item.type === "admin" && !user?.isAdmin) return null;
 
             return (
               <ListItem key={Item.id} disablePadding>

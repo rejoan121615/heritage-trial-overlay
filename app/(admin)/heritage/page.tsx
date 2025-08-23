@@ -31,7 +31,7 @@ const AllHeritage = () => {
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const [heritageViewState, setHeritageViewState] =
     useState<HeritageViewState>("my");
-  const currentUser = React.useContext(UserContext);
+  const { user, setUser } = React.useContext(UserContext);
   const { showMessage } = useSnackbar();
 
   useEffect(() => {
@@ -62,17 +62,17 @@ const AllHeritage = () => {
 
   // heritage list state updater
   useEffect(() => {
-    if (currentUser && heritageDocumentSnapshort) {
+    if (user && heritageDocumentSnapshort) {
       if (heritageViewState === "my") {
         const myHeritageList = heritageDocumentSnapshort?.filter(
-          (item) => item.userId === currentUser?.userId
+          (item) => item.userId === user?.userId
         );
         setHeritageList(myHeritageList);
       } else {
         setHeritageList(heritageDocumentSnapshort);
       }
     }
-  }, [heritageViewState, currentUser, heritageDocumentSnapshort]);
+  }, [heritageViewState, user, heritageDocumentSnapshort]);
 
   const showEditHeritageHandler = (id: string) => {
     setShowEdit(true);
@@ -130,7 +130,7 @@ const AllHeritage = () => {
 
   return (
     <>
-      {currentUser?.isAdmin && (
+      {user?.isAdmin && (
         <Paper
           sx={{
             width: "100%",

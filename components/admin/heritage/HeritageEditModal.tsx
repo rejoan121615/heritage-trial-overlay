@@ -75,7 +75,7 @@ const HeritageEditModal = ({
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { showMessage } = useSnackbar();
-  const currentUser = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   // update default value
   useEffect(() => {
@@ -132,8 +132,8 @@ const HeritageEditModal = ({
       };
 
       // if image updated → upload it first
-      if (image && heritageData?.imgPublicId && currentUser?.userId) {
-        uploadedImgRes = await uploadToCloudinary(image, currentUser?.userId, "heritages");
+      if (image && heritageData?.imgPublicId && user?.userId) {
+        uploadedImgRes = await uploadToCloudinary(image, user?.userId, "heritages");
         await deleteFromCloudinary(heritageData.imgPublicId);
         if (!uploadedImgRes.success) {
           console.log("Image upload failed, try again");

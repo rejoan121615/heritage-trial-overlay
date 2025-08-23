@@ -86,7 +86,13 @@ const ProfileEditSchema = z
 
 type ProfileEditTYPE = z.infer<typeof ProfileEditSchema>;
 
-const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
+const ProfileEdit = ({
+  closeEdit,
+  setApplyEdit,
+}: {
+  closeEdit: () => void;
+  setApplyEdit: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   // form hooks
   const {
     handleSubmit,
@@ -107,60 +113,61 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
   });
 
   const [preview, setPreview] = useState<File | null>(null);
-  const currentUser = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const { showMessage } = useSnackbar();
 
   //   form value setter
   useEffect(() => {
     reset({
-      name: currentUser?.name,
-      email: currentUser?.email,
+      name: user?.name,
+      email: user?.email,
     });
   }, []);
 
   const submitHandler = async (data: ProfileEditTYPE) => {
     const { image, name, email, oldPassword, password } = data;
 
-    console.log("your form data ", data);
-
     if (!auth.currentUser) return;
-    const user = auth.currentUser;
+    const authUser = auth.currentUser;
 
     closeEdit();
+    setApplyEdit(true);
 
     try {
       // handle dublicate email
       try {
-        await updateEmail(user, email);
+        await updateEmail(authUser, email);
       } catch (error: any) {
         if (error.code === "auth/email-already-in-use") {
           showMessage(
             "Email update failed as it is already attached to another account",
             "error"
           );
+          setApplyEdit(false);
         } else {
           showMessage("Email update failed", "error");
+          setApplyEdit(false);
         }
         return;
       }
 
       // update profile name
-      if (name && name !== user.displayName) {
-        await updateProfile(user, { displayName: name });
+      if (name && name !== authUser.displayName) {
+        await updateProfile(authUser, { displayName: name });
       }
 
       // update password (reauth required)
       if (oldPassword && password) {
         const credential = EmailAuthProvider.credential(
-          user.email!, // must be current email from Firebase
+          authUser.email!, // must be current email from Firebase
           oldPassword
         );
-        await reauthenticateWithCredential(user, credential);
-        await updatePassword(user, password);
+        await reauthenticateWithCredential(authUser, credential);
+        await updatePassword(authUser, password);
       }
 
       // -------- Update Firestore users record -------- //
-      const userRef = doc(db, "users", user.uid);
+      const userRef = doc(db, "users", authUser.uid);
       const updatePayload: Partial<UserTYPE> = {};
       let imgUploadRes: CloudinaryUploadResponseTYPE = {
         success: false,
@@ -171,12 +178,16 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
       if (name) updatePayload.name = name;
       if (email) updatePayload.email = email;
       // upload image Cloudinary
-      if (image && currentUser?.userId) {
-        if (currentUser?.imgPublicId) {
-          await deleteFromCloudinary(currentUser.imgPublicId);
+      if (image && user?.userId) {
+        if (user?.imgPublicId) {
+          await deleteFromCloudinary(user.imgPublicId);
         }
 
-        imgUploadRes = await uploadToCloudinary(image, currentUser.userId, "profile");
+        imgUploadRes = await uploadToCloudinary(
+          image,
+          user.userId,
+          "profile"
+        );
         console.log(" image upload response ", imgUploadRes);
         if (imgUploadRes.success) {
           updatePayload.image = imgUploadRes.imageUrl
@@ -193,9 +204,22 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
       }
 
       showMessage("Profile updated successfully", "success");
+      // update user state 
+      setUser((prevState) => {
+        if (!prevState) return prevState;
+        return {
+          ...prevState,
+          name: updatePayload.name ? updatePayload.name : prevState.name,
+          email: updatePayload.email ? updatePayload.email : prevState.email,
+          image: updatePayload.image ? updatePayload.image : prevState.image,
+          imgPublicId: updatePayload.imgPublicId ? updatePayload.imgPublicId : prevState.imgPublicId,
+        }
+      });
+      setApplyEdit(false);
     } catch (error: any) {
       console.error(error);
       showMessage(error.message || "Profile update failed", "error");
+      setApplyEdit(false);
     }
   };
 
@@ -222,7 +246,7 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
               sx={{ width: "150px", height: "150px" }}
               src={
                 preview === null
-                  ? currentUser?.image
+                  ? user?.image
                   : URL.createObjectURL(preview)
               }
             />
@@ -255,7 +279,9 @@ const ProfileEdit = ({ closeEdit }: { closeEdit: () => void }) => {
           </Box>
         </Grid>
 
-        {!!errors.image?.message && <Typography color="error">{errors.image.message}</Typography>}
+        {!!errors.image?.message && (
+          <Typography color="error">{errors.image.message}</Typography>
+        )}
       </HeritageDetailsRow>
 
       <Grid size={12} sx={{ marginTop: { xs: "15px", sm: "0px" } }}>

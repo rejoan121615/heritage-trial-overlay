@@ -46,3 +46,8 @@ export type CloudinaryDeleteResponseTYPE = {
   success: boolean
   error?: string
 }
+
+export type UserContextTYPE = {
+  user: UserTYPE | null;
+  setUser: React.Dispatch<React.SetStateAction<UserTYPE | null>>;
+}

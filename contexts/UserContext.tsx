@@ -1,5 +1,5 @@
-import { UserTYPE } from "@/types/AllTypes";
+import { UserContextTYPE, UserTYPE } from "@/types/AllTypes";
 import { createContext } from "react";
 
-export const UserContext = createContext<UserTYPE | null>(null);
+export const UserContext = createContext<UserContextTYPE>({} as UserContextTYPE);
 
