@@ -103,11 +103,12 @@ const AdminNav = () => {
   return (
     <>
       <CssBaseline />
+      {/* app bar for large screen  */}
       <AppBar
         position="fixed"
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          display: { xs: "block", md: "none" },
+          backgroundColor: '#ffffff',
         }}
       >
         <Toolbar>

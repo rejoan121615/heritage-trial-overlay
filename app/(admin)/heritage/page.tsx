@@ -70,7 +70,6 @@ const AllHeritage = () => {
 
   // heritage list state updater
   useEffect(() => {
-    console.log('run heritage snapshort ', heritageDocumentSnapshort)
     if (user && heritageDocumentSnapshort) {
       if (heritageViewState === "my") {
         const myHeritageList = heritageDocumentSnapshort?.filter(
