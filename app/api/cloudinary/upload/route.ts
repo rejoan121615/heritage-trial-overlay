@@ -25,14 +25,14 @@ export async function POST(req: NextRequest) {
     const result = await new Promise<UploadApiResponse>((resolve, reject) => {
       const heritageTransformation = [
         {
-          aspect_ratio: "2.0",
-          crop: "fill",
           width: "1000",
           height: "500",
+          crop: "pad",
+          background: "transparent",
+          fetch_format: "webp"
         },
         {
           quality: "auto",
-          fetch_format: "auto",
         },
       ];
 
@@ -62,7 +62,10 @@ export async function POST(req: NextRequest) {
           error: UploadApiErrorResponse | undefined,
           result: UploadApiResponse | undefined
         ) => {
-          if (error) return reject(error);
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            return reject(error);
+          } 
           if (!result)
             return reject(new Error("Cloudinary returned no result"));
 

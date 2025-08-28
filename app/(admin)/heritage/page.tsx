@@ -140,9 +140,6 @@ const AllHeritage = () => {
     }
   };
 
-  useEffect(() => {
-    console.log('updated heritage list', heritageList)
-  }, [heritageList])
 
   return (
     <>
@@ -203,7 +200,10 @@ const AllHeritage = () => {
       {/* delete confirmation dialog  */}
       <DeleteConfirmationDialog
         open={deleteConfirmationOpen}
-        onClose={() => setDeleteConfirmationOpen(false)}
+        onClose={() => { 
+          setDeleteConfirmationOpen(false);
+          setSelectedHeritage(null);
+        }}
         onDelete={deleteHeritageHandler}
       />
 
