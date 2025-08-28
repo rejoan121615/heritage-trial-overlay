@@ -117,9 +117,8 @@ const HeritageDetailsPage = ({
                   alt={heritage?.title}
                   style={{
                     width: "100%",
-                    height: "initial",
-                    aspectRatio: "2 / 1",
-                  }}
+                    height: "initial"
+                                    }}
                 />
               </HeritageDetailsRow>
 
