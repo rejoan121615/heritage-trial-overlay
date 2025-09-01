@@ -7,28 +7,27 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import { NavList } from "../AdminNav-data";
-import Link from "next/link";
-import UserProfile from "@/components/userProfile";
+import { Menu, MenuItem, Avatar } from "@mui/material";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { UserContext } from "@/contexts/UserContext";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import NavDrawer from "./NavDrawer";
+import NotificationList from "./NotificationList";
+
 
 const drawerWidth = "300px";
 
 const AdminNav = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
+  const openNotification = Boolean(notificationAnchor);
+
   const router = useRouter();
-  const { user } = useContext(UserContext);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -45,60 +44,16 @@ const AdminNav = () => {
     }
   };
 
-  const logoutHandler = async () => {
-    try {
-      await signOut(auth);
-      router.replace("/login");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+ 
+  const bellBtnClickHandler = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchor(event.currentTarget);
   };
 
-  const drawer = (
-    <Box
-      sx={{
-        display: "flex",
-        flexFlow: "column wrap",
-        justifyContent: "space-between",
-        height: "100%",
-      }}
-    >
-      {/* navigation  */}
-      <Box>
-        <Toolbar></Toolbar>
-        <Divider />
-        <List>
-          {NavList.map((Item) => {
-            if (Item.type === "admin" && !user?.isAdmin) return null;
+  const notificationCloseHandler = () => {
+    setNotificationAnchor(null);
+  };
 
-            return (
-              <ListItem key={Item.id} disablePadding>
-                <Link
-                  href={`/${Item.path}`}
-                  style={{ width: "100%", textDecoration: "none" }}
-                >
-                  {Item.title === "Profile" ? (
-                    <Divider component={"div"} sx={{ width: "100%" }} />
-                  ) : null}
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <Item.icon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={Item.title}
-                      sx={{ color: "#707070" }}
-                    />
-                  </ListItemButton>
-                </Link>
-              </ListItem>
-            );
-          })}
-        </List>
-      </Box>
-      {/* user area  */}
-      <UserProfile logout={logoutHandler} />
-    </Box>
-  );
+  
 
   return (
     <>
@@ -107,20 +62,39 @@ const AdminNav = () => {
       <AppBar
         position="fixed"
         sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          backgroundColor: '#ffffff',
+          width: { md: `calc(100% - ${drawerWidth})` },
+          backgroundColor: "#ffffff",
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ justifyContent: { xs: "space-between", md: "end" } }}>
+          {/* navbar button  */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { lg: "none" } }}
+            sx={{ marginLeft: "10px", display: { md: "none" } }}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ color: "#1565c0" }} />
           </IconButton>
+          {/* notification button  */}
+          {/* <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={bellBtnClickHandler}
+            sx={{ marginRight: "10px" }}
+          >
+            <NotificationsNoneIcon sx={{ color: "#1565c0" }} />
+          </IconButton> */}
+
+          {/* notification components  */}
+          <NotificationList
+            notificationAnchor={notificationAnchor}
+            openNotification={openNotification}
+            notificationCloseHandler={notificationCloseHandler}
+          />
+          
         </Toolbar>
       </AppBar>
       <Box
@@ -146,7 +120,7 @@ const AdminNav = () => {
             },
           }}
         >
-          {drawer}
+          <NavDrawer />
         </Drawer>
         <Drawer
           variant="permanent"
@@ -159,7 +133,7 @@ const AdminNav = () => {
           }}
           open
         >
-          {drawer}
+          <NavDrawer />
         </Drawer>
       </Box>
     </>
