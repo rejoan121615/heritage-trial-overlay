@@ -315,6 +315,7 @@ const HeritageEditModal = ({
                     height={125}
                     src={previewImage}
                     alt="Heritage Image"
+                    style={{ width: 'initial'}}
                   />
                   <Typography
                     variant="subtitle1"

@@ -20,36 +20,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(res, { status: 400 });
     }
 
+    // image upload configration based on folder 
+    const heritageTransformation = [
+      {
+        width: 1000,
+        height: 500,
+        crop: "pad",
+        background: "transparent",
+        fetch_format: "webp",
+      },
+      {
+        quality: "auto",
+      },
+    ];
+
+    const userTransformation = [
+      {
+        width: 300,
+        height: 300,
+        crop: "fill",
+        gravity: "auto",
+        quality: "auto",
+      },
+      {
+        quality: "auto",
+        fetch_format: "auto",
+      },
+    ];
+
     const buffer = Buffer.from(await (file as File).arrayBuffer());
 
     const result = await new Promise<UploadApiResponse>((resolve, reject) => {
-      const heritageTransformation = [
-        {
-          width: "1000",
-          height: "500",
-          crop: "pad",
-          background: "transparent",
-          fetch_format: "webp"
-        },
-        {
-          quality: "auto",
-        },
-      ];
-
-      const userTransformation = [
-        {
-          width: 300,
-          height: 300,
-          crop: "fill",
-          gravity: "auto",
-          quality: "auto",
-        },
-        {
-          quality: "auto",
-          fetch_format: "auto",
-        },
-      ];
-
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: `users/${userId?.toString()}/${folderName?.toString()}`,
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
           if (error) {
             console.error("Cloudinary upload error:", error);
             return reject(error);
-          } 
+          }
           if (!result)
             return reject(new Error("Cloudinary returned no result"));
 
