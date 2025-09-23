@@ -54,6 +54,7 @@ export default function CameraPage() {
 
     setMobile(isMobile());
 
+
     // get landscape state
     const isLandscape = () =>
       window.matchMedia("(orientation: landscape)").matches;
@@ -71,7 +72,8 @@ export default function CameraPage() {
 
   return (
     <>
-      {heritageNotFound === null ? (
+      {/* {heritageNotFound === null ? ( */}
+      {heritageNotFound === null  ? (
         <LoadingPage />
       ) : heritageNotFound ? (
         <HeritageNotFound />

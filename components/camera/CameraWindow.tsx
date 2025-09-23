@@ -27,7 +27,7 @@ const CameraWindow = () => {
         setCameraStream(stream);
         setCameraAccess(true);
       })
-      .catch(() => {
+      .catch((e) => {
         setCameraAccess(false);
       });
   }, []);

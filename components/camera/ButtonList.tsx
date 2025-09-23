@@ -4,7 +4,13 @@ import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseIcon from "@mui/icons-material/Close";
 import CustomButton from "../CustomComponent/CameraBtn";
 
-const ButtonList = ({ fullScreen, change }: { fullScreen:  () => void, change: (event: Event, newValue: number) => void }) => {
+const ButtonList = ({
+  fullScreen,
+  change,
+}: {
+  fullScreen: () => void;
+  change: (event: Event, newValue: number) => void;
+}) => {
   return (
     <Box
       sx={{
@@ -16,7 +22,11 @@ const ButtonList = ({ fullScreen, change }: { fullScreen:  () => void, change: (
         paddingBottom: "10px",
       }}
     >
-      <CustomButton variant="contained" sx={{ marginBottom: "20px" }} onClick={fullScreen}>
+      <CustomButton
+        variant="contained"
+        sx={{ marginBottom: "20px" }}
+        onClick={fullScreen}
+      >
         <OpenInFullIcon sx={{ fontSize: "20px" }} />
       </CustomButton>
       <Box

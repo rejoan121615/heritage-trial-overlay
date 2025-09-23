@@ -13,12 +13,13 @@ import Link from "next/link";
 import UserProfile from "@/components/userProfile";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { NavList } from "../AdminNav-data";
 import { UserContext } from "@/contexts/UserContext";
 
 const NavDrawer = () => {
   const { user } = useContext(UserContext);
+  const router = useRouter(); // <-- use the hook
 
   const logoutHandler = async () => {
     try {
