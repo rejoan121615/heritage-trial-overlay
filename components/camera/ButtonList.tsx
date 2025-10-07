@@ -4,7 +4,7 @@ import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseIcon from "@mui/icons-material/Close";
 import CustomButton from "../CustomComponent/CameraBtn";
 
-const ButtonList = ({ fullScreen, change }: { fullScreen:  () => void, change: (event: Event, newValue: number) => void }) => {
+const ButtonList = ({ fullScreen, change, onCancel }: { fullScreen:  () => void, change: (event: Event, newValue: number) => void,  onCancel: () => void  }) => {
   return (
     <Box
       sx={{
@@ -40,6 +40,7 @@ const ButtonList = ({ fullScreen, change }: { fullScreen:  () => void, change: (
         variant="contained"
         color="error"
         sx={{ marginTop: "20px" }}
+         onClick={onCancel}
       >
         <CloseIcon sx={{ fontSize: "20px" }} />
       </CustomButton>

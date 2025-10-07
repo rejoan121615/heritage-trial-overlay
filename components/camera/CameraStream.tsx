@@ -5,6 +5,7 @@ import ButtonList from "./ButtonList";
 import CameraBtn from "@/components/CustomComponent/CameraBtn";
 import Summary from "./Summary";
 import { CameraContext } from "@/contexts/CameraContext";
+import { useRouter } from "next/navigation";
 
 const CameraStream = ({
   cameraStream,
@@ -16,6 +17,8 @@ const CameraStream = ({
   const [showSummary, setShowSummary] = useState<boolean>(false);
   const [slider, setSlider] = useState<number>(0.5);
   const { heritageData } = useContext(CameraContext);
+
+  const router = useRouter();
 
   // use slider value as ref to get the latest value
   const sliderRef = useRef(slider);
@@ -119,6 +122,22 @@ const CameraStream = ({
     setSlider(newValue / 100);
   };
 
+  const handleCancel = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => {
+        track.stop();
+        track.enabled = false;
+       });
+    }
+
+    // clear video elements
+     const videoElements = document.querySelectorAll('video');
+    videoElements.forEach(video => {
+      video.srcObject = null;
+    });
+      router.push("/visite/thank-you");
+  }
+
   return (
     <Box
       sx={{
@@ -144,6 +163,7 @@ const CameraStream = ({
         <ButtonList
           fullScreen={toggleFullscreen}
           change={sliderChangeHandler}
+          onCancel={handleCancel}
         />
 
         <Box
