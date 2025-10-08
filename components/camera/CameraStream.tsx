@@ -122,7 +122,18 @@ const CameraStream = ({
     setSlider(newValue / 100);
   };
 
-  const handleCancel = () => {
+  // exit fullscreen
+    const exitFullscreen = async (): Promise<void> => {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      await document.exitFullscreen();
+    }
+  };
+
+  // handle cancel and exit fullscreen
+  const handleCancel = async() => {
+      if (document.fullscreenElement) {
+        await exitFullscreen();
+      }
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => {
         track.stop();
