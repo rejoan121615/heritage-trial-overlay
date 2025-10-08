@@ -3,8 +3,6 @@
 import React from "react";
 import { Box, Typography, Button, Container, Paper } from "@mui/material";
 import { useRouter } from "next/navigation";
-import HomeIcon from "@mui/icons-material/Home";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function ThankYouPage() {
   const router = useRouter();
@@ -12,8 +10,7 @@ export default function ThankYouPage() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        minHeight: "100svh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -31,32 +28,6 @@ export default function ThankYouPage() {
             backdropFilter: "blur(10px)",
           }}
         >
-          {/* Success Icon */}
-          <Box
-            sx={{
-              width: 100,
-              height: 100,
-              borderRadius: "50%",
-              background: "linear-gradient(45deg, #4CAF50, #8BC34A)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 24px",
-              boxShadow: "0 4px 20px rgba(76, 175, 80, 0.3)",
-            }}
-          >
-            <Typography
-              variant="h3"
-              sx={{
-                color: "white",
-                fontWeight: "bold",
-                fontSize: "2.5rem",
-              }}
-            >
-              ✓
-            </Typography>
-          </Box>
-
           {/* Main Title */}
           <Typography
             variant="h3"
@@ -68,7 +39,7 @@ export default function ThankYouPage() {
               WebkitBackgroundClip: "text",
               color: "transparent",
               marginBottom: 2,
-              fontSize: { xs: "2rem", md: "2.5rem" },
+              fontSize: "17px",
             }}
           >
             Thank You for Visiting!
@@ -77,10 +48,12 @@ export default function ThankYouPage() {
           {/* Subtitle */}
           <Typography
             variant="h6"
+            component="p"
             sx={{
               color: "#666",
               marginBottom: 4,
               lineHeight: 1.6,
+               fontSize: "14px",
             }}
           >
             We appreciate your time and hope you enjoyed your experience with our heritage scanning feature.
