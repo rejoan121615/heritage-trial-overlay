@@ -13,7 +13,7 @@ const ButtonList = ({
 	change: (event: Event, newValue: number) => void;
 	onCancel: () => void;
 }) => {
-	const [isIOS, setIsIOS] = useState(true);
+	const [isIOS, setIsIOS] = useState(false);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -22,7 +22,9 @@ const ButtonList = ({
 	}, []);
 
 	// ✅ Safari fallback: handle both touch + click
-	const handleCancel = (e: React.MouseEvent | React.TouchEvent) => {
+	const handleCancel = (
+		e: React.TouchEvent | React.MouseEvent | React.PointerEvent
+	) => {
 		e.preventDefault();
 		e.stopPropagation();
 		onCancel();
@@ -46,23 +48,23 @@ const ButtonList = ({
 		>
 			{/* Hide full screen button on iOS */}
 
-			<CustomButton
-				variant="contained"
-				sx={{
-					marginBottom: "20px",
-					opacity: isIOS ? 0 : 1,
-				}}
-				onClick={fullScreen}
-				disabled={isIOS}
-			>
-				<OpenInFullIcon sx={{ fontSize: "20px" }} />
-			</CustomButton>
+			{!isIOS && (
+				<CustomButton
+					variant="contained"
+					sx={{
+						marginBottom: "20px",
+					}}
+					onClick={fullScreen}
+				>
+					<OpenInFullIcon sx={{ fontSize: "20px" }} />
+				</CustomButton>
+			)}
 
 			<Box
 				sx={{
 					mt: "10px",
 					width: "50px",
-					height: "70%",
+					//height: "70%",
 					flex: "1",
 					display: "flex",
 					alignSelf: "center",
@@ -82,58 +84,15 @@ const ButtonList = ({
 				variant="contained"
 				color="error"
 				sx={{
-					marginTop: "20px",
-					position: "fixed",
-					zIndex: 1,
-					bottom: "calc(10px +env(safe-area-inset-bottom))",
-					transform: "translateY(-10px)",
-					minWidth: "44px",
-					minHeight: "44px",
-
-					touchAction: "manipulation",
-					WebkitTapHighlightColor: "transparent",
-					cursor: "pointer",
-					pointerEvents: "auto",
-					WebkitUserSelect: "none",
+					marginTop: "10px",
 				}}
-				onTouchStart={handleCancel}
+				//onTouchStart={handleCancel}
+				//onTouchEnd={handleCancel}
 				onClick={handleCancel}
+				//onPointerUp={handleCancel}
 			>
 				<CloseIcon sx={{ fontSize: "20px" }} />
 			</CustomButton>
-			{/* <Box
-				sx={{
-					position: "relative",
-					width: "100%",
-					display: "flex",
-					justifyContent: "center",
-					mt: "20px",
-				}}
-			>
-				<CustomButton
-					variant="contained"
-					color="error"
-					sx={{
-						marginTop: "20px",
-						position: "fixed",
-						zIndex: 1,
-						bottom: "calc(20px + env(safe-area-inset-bottom))",
-						transform: "translateY(-10px)",
-						minWidth: "44px",
-						minHeight: "44px",
-
-						touchAction: "manipulation",
-						WebkitTapHighlightColor: "transparent",
-						cursor: "pointer",
-						pointerEvents: "auto",
-						WebkitUserSelect: "none",
-					}}
-					onTouchStart={handleCancel}
-					onClick={handleCancel}
-				>
-					<CloseIcon sx={{ fontSize: "20px" }} />
-				</CustomButton>
-			</Box> */}
 		</Box>
 	);
 };
