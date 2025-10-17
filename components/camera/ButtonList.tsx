@@ -86,10 +86,7 @@ const ButtonList = ({
 				sx={{
 					marginTop: "10px",
 				}}
-				//onTouchStart={handleCancel}
-				//onTouchEnd={handleCancel}
 				onClick={handleCancel}
-				//onPointerUp={handleCancel}
 			>
 				<CloseIcon sx={{ fontSize: "20px" }} />
 			</CustomButton>
