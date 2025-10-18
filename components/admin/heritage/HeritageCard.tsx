@@ -7,31 +7,77 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { HeritageDataTYPE } from "@/types/AllTypes";
 import Link from "next/link";
+import Divider from "@mui/material/Divider";
 
-const HeritageCard = ( { data, showEditForm, delete: deleteHeritage } : { data : HeritageDataTYPE, showEditForm: (id: string) => void, delete: (id: string) => void } ) => {
+const HeritageCard = ({
+  data,
+  showEditForm,
+  delete: deleteHeritage,
+}: {
+  data: HeritageDataTYPE;
+  showEditForm: (id: string) => void;
+  delete: (id: string) => void;
+}) => {
   return (
-    <Card sx={{ width: '100%' }}>
+    <Card sx={{ width: "100%" }}>
       <CardMedia
         component="img"
         alt="green iguana"
         height="140"
         image={data.image}
-        sx={{ height: '200px'}}
+        sx={{ height: "200px" }}
       />
-      <CardContent sx={{ height: '120px'}}>
+      <CardContent sx={{ height: "120px" }}>
         <Typography gutterBottom variant="h5" component="div">
-          { data.title }
+          {data.title}
         </Typography>
-        <Typography variant="body2" sx={{ color: "text.secondary", maxHeight: '60px', overflow: 'hidden' }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            maxHeight: "60px",
+            overflow: "hidden",
+          }}
+        >
           {data.summary}
         </Typography>
       </CardContent>
-      <CardActions sx={{ padding: '15px'}}>
+      <>
+        <Divider sx={{ marginTop: "10px" }} />
+        <Typography
+          sx={{
+            padding: "8px 15px",
+            fontSize: "15px",
+            color: "text.secondary",
+            backgroundColor: "#e7e6e7ff",
+          }}
+        >
+          Created by : {"Mohd Rejoan"}
+        </Typography>
+        <Divider sx={{ marginBottom: "5px" }} />
+      </>
+      <CardActions sx={{ padding: "15px" }}>
         <Link href={`/heritage/${data.id}`}>
-          <Button size="small" variant="contained" color="secondary">details</Button>
+          <Button size="small" variant="contained" color="secondary">
+            details
+          </Button>
         </Link>
-        <Button size="small" variant="contained" color="info" onClick={() => showEditForm(data.id)}>edit</Button>
-        <Button size="small" variant="contained" color="warning" onClick={() => deleteHeritage(data.id)}>delete</Button>
+        <Button
+          size="small"
+          variant="contained"
+          color="info"
+          onClick={() => showEditForm(data.id)}
+        >
+          edit
+        </Button>
+        <Button
+          size="small"
+          variant="contained"
+          color="warning"
+          onClick={() => deleteHeritage(data.id)}
+        >
+          delete
+        </Button>
       </CardActions>
     </Card>
   );
