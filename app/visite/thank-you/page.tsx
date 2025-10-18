@@ -51,7 +51,6 @@ export default function ThankYouPage() {
 						component="p"
 						sx={{
 							color: "#666",
-							marginBottom: 4,
 							lineHeight: 1.6,
 							fontSize: "14px",
 						}}
