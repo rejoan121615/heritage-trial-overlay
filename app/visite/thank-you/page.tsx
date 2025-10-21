@@ -1,11 +1,8 @@
 "use client";
-
 import React from "react";
-import { Box, Typography, Button, Container, Paper } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { Box, Typography, Container, Paper } from "@mui/material";
 
 export default function ThankYouPage() {
-	const router = useRouter();
 
 	return (
 		<Box

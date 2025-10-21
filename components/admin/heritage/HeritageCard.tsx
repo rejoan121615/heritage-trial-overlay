@@ -58,7 +58,10 @@ const HeritageCard = ({
 			/>
 			<CardContent sx={{ height: "120px" }}>
 				<Typography gutterBottom variant="h5" component="div">
-					{data.title}
+					{(() => {
+						const t = data.title ?? "";
+						return t.length > 17 ? t.slice(0, 17) + "..." : t;
+					})()}
 				</Typography>
 				<Typography
 					variant="body2"

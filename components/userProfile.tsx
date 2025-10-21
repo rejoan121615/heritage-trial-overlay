@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Box, Divider, Avatar, Typography, Button } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
-import { UserContext } from 'contexts/UserContext'
+import { UserContext } from '@/contexts/UserContext'
 
 const UserProfile = ({logout} : {logout: () => void}) => {
   const [authUser] = useAuthState(auth);

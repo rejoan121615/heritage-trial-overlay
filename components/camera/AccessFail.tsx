@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   Box,
   List,
@@ -37,10 +37,10 @@ const AccessFail = () => {
             </ListItemText>
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
-            <ListItemText>Tap "Permissions".</ListItemText>
+            <ListItemText>Tap &quot;Permissions&quot;.</ListItemText>
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
-            <ListItemText>Find "Camera" and allow camera permission.</ListItemText>
+            <ListItemText>Find &quot;Camera&quot; and allow camera permission.</ListItemText>
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
             <ListItemText>Refresh the page <RxReload style={{ fontSize: "20px", margin: "0px 5px -5px 5px" }} />.</ListItemText>
@@ -65,7 +65,7 @@ const AccessFail = () => {
             <ListItemText>Turn camera permissions ON.</ListItemText>
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
-            <ListItemText>If the icon doesn't appear, check your iPhone Settings → Privacy & Security → Camera → Chrome.</ListItemText>
+            <ListItemText>If the icon doesn&apos;t appear, check your iPhone Settings → Privacy & Security → Camera → Chrome.</ListItemText>
           </ListItem>
         </List>
 
@@ -77,17 +77,17 @@ const AccessFail = () => {
         <List sx={{ listStyleType: "disc", marginLeft: "40px" }}>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
             <ListItemText>
-              Tap the "aA" icon or <TuneIcon sx={{ fontSize: "20px", marginBottom: "-5px" }} /> icon in the address bar.
+              Tap the &quot;aA&quot; icon or <TuneIcon sx={{ fontSize: "20px", marginBottom: "-5px" }} /> icon in the address bar.
             </ListItemText>
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
-            <ListItemText>Tap "Website Settings".</ListItemText>
+            <ListItemText>Tap &quot;Website Settings&quot;.</ListItemText>
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
-            <ListItemText>Find "Camera" and select "Allow".</ListItemText>
+            <ListItemText>Find &quot;Camera&quot; and select &quot;Allow&quot;.</ListItemText>
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 0, paddingTop: "0", paddingBottom: "0" }}>
-            <ListItemText>Tap "Done" and refresh the page.</ListItemText>
+            <ListItemText>Tap &quot;Done&quot; and refresh the page.</ListItemText>
           </ListItem>
         </List>
       </Box>

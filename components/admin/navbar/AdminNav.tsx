@@ -1,20 +1,13 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import { Menu, MenuItem, Avatar } from "@mui/material";
-import { signOut } from "firebase/auth";
-import { auth } from "@/firebase/firebaseConfig";
-import { useRouter } from "next/navigation";
-import { UserContext } from "@/contexts/UserContext";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NavDrawer from "./NavDrawer";
 import NotificationList from "./NotificationList";
 
@@ -26,8 +19,6 @@ const AdminNav = () => {
   const [isClosing, setIsClosing] = useState(false);
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
   const openNotification = Boolean(notificationAnchor);
-
-  const router = useRouter();
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -42,11 +33,6 @@ const AdminNav = () => {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
     }
-  };
-
- 
-  const bellBtnClickHandler = (event: React.MouseEvent<HTMLElement>) => {
-    setNotificationAnchor(event.currentTarget);
   };
 
   const notificationCloseHandler = () => {
@@ -77,17 +63,6 @@ const AdminNav = () => {
           >
             <MenuIcon sx={{ color: "#1565c0" }} />
           </IconButton>
-          {/* notification button  */}
-          {/* <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={bellBtnClickHandler}
-            sx={{ marginRight: "10px" }}
-          >
-            <NotificationsNoneIcon sx={{ color: "#1565c0" }} />
-          </IconButton> */}
-
           {/* notification components  */}
           <NotificationList
             notificationAnchor={notificationAnchor}
