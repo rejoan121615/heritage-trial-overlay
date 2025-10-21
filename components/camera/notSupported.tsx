@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
-import NotSupportedIcon from "public/icons/user-interface.png";
+import NotSupportedIcon from "@/public/icons/user-interface.png";
 
 const NotSupported = () => {
   return (
